@@ -2,7 +2,7 @@
 ' Messages - Constants for Windows messages
 '
 '   © 2026 Remus Rigo
-'      v1.0 2026-06-01
+'      v1.0 2026-06-11
 '--------------------------------------------------------------------------------------------------
 
 Imports System.Runtime.InteropServices
@@ -115,6 +115,35 @@ Friend Module Messages
    Public Const LVNI_BELOW As Integer = 512
    Public Const LVNI_TOLEFT As Integer = 1024
    Public Const LVNI_TORIGHT As Integer = 2048
+
+   '--------------------------------------------------------------------------------------------------
+   ' Extended List-View Styles
+   Public Const LVS_EX_GRIDLINES As Integer = 1 ' Draws grid lines between items and sub-items.
+   Public Const LVS_EX_SUBITEMIMAGES As Integer = 2 ' Allows images to be displayed for sub-items in report view.
+   Public Const LVS_EX_CHECKBOXES As Integer = 4 ' Enables checkboxes next to items in any view.
+   Public Const LVS_EX_TRACKSELECT As Integer = 8 ' Enables hot tracking (items are underlined when the mouse hovers).
+   Public Const LVS_EX_HEADERDRAGDROP As Integer = 16 ' Enables drag-and-drop reordering of columns in report view.
+   Public Const LVS_EX_FULLROWSELECT As Integer = 32 ' Selecting an item highlights the entire row (report view only).
+   Public Const LVS_EX_FLATSB As Integer = 64 ' Obsolete. Enables flat scroll bars.
+   Public Const LVS_EX_REGIONAL As Integer = 128 ' Creates a window region that includes only the pixels drawn for items.
+   Public Const LVS_EX_INFOTIP As Integer = 1024 ' Enables tooltip information for items.
+   Public Const LVS_EX_UNDERLINEHOT As Integer = 2048 ' Underlines hot-tracked items.
+   Public Const LVS_EX_UNDERLINECOLD As Integer = 4096 ' Underlines non-hot-tracked items.
+   Public Const LVS_EX_MULTIWORKAREAS As Integer = 8192 ' Enables multiple work areas in icon view.
+   Public Const LVS_EX_LABELTIP As Integer = 16384 ' Draws tooltips for clipped labels if item text doesn't fit.
+   Public Const LVS_EX_BORDERSELECT As Integer = 32768 ' Draws a border around focused items instead of highlighting.
+   Public Const LVS_EX_DOUBLEBUFFER As Integer = 65536 ' Double-buffers the control to eliminate flickering during redraws.
+   Public Const LVS_EX_HIDELABELS As Integer = 131072 ' Hides labels in icon and small icon view.
+   Public Const LVS_EX_SINGLEROW As Integer = 262144 ' Unused.
+   Public Const LVS_EX_SNAPTOGRID As Integer = 524288 ' Snaps icons to the grid in icon view.
+   Public Const LVS_EX_SIMPLESELECT As Integer = 1048576 ' Simplifies selection (single click activates/selects).
+   Public Const LVS_EX_JUSTIFYCOLUMNS As Integer = 2097152 ' Justifies columns in report view.
+   Public Const LVS_EX_TRANSPARENTBKGND As Integer = 4194304 ' Requires themes. Draws a transparent background.
+   Public Const LVS_EX_TRANSPARENTNOTEBOOK As Integer = 8388608 ' Requires themes. Not commonly used.
+   Public Const LVS_EX_BUSINESSMODELS As Integer = 16777216 ' Applies alternate row colors (light/dark tinting).
+   Public Const LVS_EX_SCALEICONGAP As Integer = 33554432 ' Scales the gap between icons based on DPI.
+   Public Const LVS_EX_COLUMNRUMBLE As Integer = 67108864 ' Internal Windows use.
+   Public Const LVS_EX_HEADERINALLVIEWS As Integer = 33554432 ' Displays the column header in all views, not just report view.
 
    '--------------------------------------------------------------------------------------------------
    ' Menu Flags

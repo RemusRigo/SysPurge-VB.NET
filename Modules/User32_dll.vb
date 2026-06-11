@@ -108,8 +108,14 @@ Friend Module user32_dll
    Friend Function ReleaseDC(hwnd As IntPtr, hDC As IntPtr) As Integer
    End Function
 
-   <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
-   Friend Function SendMessage(hWnd As IntPtr, Msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+   ' --- RECT version ---
+   <DllImport("user32.dll", CharSet:=CharSet.Auto)>
+   Friend Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, ByRef lParam As RECT) As IntPtr
+   End Function
+
+   ' --- IntPtr version ---
+   <DllImport("user32.dll", CharSet:=CharSet.Auto)>
+   Friend Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
    End Function
 
    <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>

@@ -36,10 +36,12 @@ Partial Class frmSysPurge
       ' lvSysPurge
       ' 
       lvSysPurge.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+      lvSysPurge.CheckBoxes = True
       lvSysPurge.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2, ColumnHeader3})
       lvSysPurge.FullRowSelect = True
       lvSysPurge.Location = New Point(0, 28)
       lvSysPurge.Name = "lvSysPurge"
+      lvSysPurge.OwnerDraw = True
       lvSysPurge.Size = New Size(809, 317)
       lvSysPurge.TabIndex = 0
       lvSysPurge.UseCompatibleStateImageBehavior = False
@@ -92,7 +94,7 @@ Partial Class frmSysPurge
       Controls.Add(ToolStrip1)
       Controls.Add(lvSysPurge)
       Name = "frmSysPurge"
-      Text = "Form1"
+      Text = "SysPurge"
       ToolStrip1.ResumeLayout(False)
       ToolStrip1.PerformLayout()
       ResumeLayout(False)
