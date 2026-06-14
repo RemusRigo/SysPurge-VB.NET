@@ -15,12 +15,32 @@ A Windows cleaning tool
 
 * You must install .NET Runtime 10 x64 and then just run SysPurge.exe
 * Tested on:
-	* Windows 10 Ent x64
-	* Windows 11 Pro x64
+
+  * Windows 10 Ent x64
+  * Windows 11 Pro x64
+
+
+
+## Features
+
+* Clean Microsoft Windows logs
+* Clean Microsoft Windows prefetch files
+* Clean Microsoft Event Viewer logs
+* Clean Microsoft Registry missing shared Dll's
+* Clean Microsoft Registry MRU
+* Clean Microsoft Teams cache
+
+
+
+## Statistics
+
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/SysPurge-VBNET/total)
+
 
 
 ## Roadmap
 
+* 2026-06-14: Add: Clear Microsoft Teams cache
 * 2026-06-13: Add: New Task for clearing folders to support multiple paths
 * 2026-06-13: Add: BlueFlame.ico
 * 2026-06-10: Add: libServices.vb
@@ -33,3 +53,4 @@ A Windows cleaning tool
 * 2012-04-21: Add: Clean Registry RunMRU
 * 2012-04-21: Add: Background Worker
 * 2012-04-21: Project started
+

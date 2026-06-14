@@ -12,7 +12,30 @@ Imports Microsoft.Win32
 
 Public Class frmSysPurge
 
+   Private Const SYSMENU_ABOUT_ID As UInteger = 1000
+
    Dim grp As ListViewGroup = Nothing
+
+   '-----------------------------------------------------------------------------------------------
+   ' onHandleCreated - Add "About" to system menu
+   Protected Overrides Sub OnHandleCreated(e As EventArgs)
+      MyBase.OnHandleCreated(e)
+      Dim hSysMenu As IntPtr = GetSystemMenu(Me.Handle, False)
+      ' Add a separator and then your custom item
+      AppendMenu(hSysMenu, MF_SEPARATOR, 0, String.Empty)
+      AppendMenu(hSysMenu, MF_STRING, SYSMENU_ABOUT_ID, "About")
+   End Sub
+
+   '-----------------------------------------------------------------------------------------------
+   ' WndProc override to handle system menu commands
+   Protected Overrides Sub WndProc(ByRef m As Message)
+      MyBase.WndProc(m)
+      If m.Msg = WM_SYSCOMMAND Then
+         If CUInt(m.WParam) = SYSMENU_ABOUT_ID Then
+            frmAbout.ShowDialog()
+         End If
+      End If
+   End Sub
 
    '-----------------------------------------------------------------------------------------------
    ' ResizeColumns: Adjusts the width of the ListView columns
@@ -70,18 +93,20 @@ Public Class frmSysPurge
       lvSysPurge.Items.Clear()
       lvSysPurge.Groups.Clear()
 
-      LV_AddGroup("Microsoft Windows FileSystem")
+      LV_AddGroup("Microsoft Windows » FileSystem")
       If IsAppElevated() Then LV_AddItem("EventViewer logs")
       LV_AddItem("Log files (inside Windows)")
       LV_AddItem("Log files (System drive)")
       LV_AddItem("Prefetch files")
-      LV_AddItem("Temp files (Current User)")
-      LV_AddItem("Temp files (Windows)")
+      LV_AddItem("Temp folder(s)")
       If IsAppElevated() Then LV_AddItem("Windows Update cache")
 
-      LV_AddGroup("Microsoft Windows Registry")
+      LV_AddGroup("Microsoft Windows » Registry")
       LV_AddItem("MRU list: Run")
       If IsAppElevated() Then LV_AddItem("Shared DLL's)")
+
+      LV_AddGroup("Microsoft Teams")
+      LV_AddItem("Cache")
 
       ResizeColumns()
       lvSysPurge.EndUpdate()
@@ -95,41 +120,47 @@ Public Class frmSysPurge
          If grp Is Nothing Then Continue For
 
          Select Case grp.Header
-            Case "Microsoft Windows FileSystem"
+            Case "Microsoft Windows » FileSystem" '------------------------------------------------
                Select Case item.Text
+
                   Case "EventViewer logs"
-                     '
+                     Dim pathsToClean As String() = {Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "System32\winevt\Logs")}
+                     StopService("eventlog")
+                     Await Task.Delay(5000)
+                     TaskCleanFolders(item, pathsToClean, "*.evtx", False, False)
+                     'TaskCleanFolder(item, Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "System32\winevt\Logs"), "*.evtx", False, False)
+                     StartService("eventlog")
 
                   Case "Log files (inside Windows)"
-                     '
+                     Dim pathsToClean As String() = {Environment.GetEnvironmentVariable("SystemRoot")}
+                     TaskCleanFolders(item, pathsToClean, "*.log", True, True)
 
                   Case "Log files (System drive)"
-                     '
+                     Dim pathsToClean As String() = {Environment.GetEnvironmentVariable("SystemDrive")}
+                     TaskCleanFolders(item, pathsToClean, "*.log", True, True)
 
                   Case "Prefetch files"
-                     TaskCleanFolder(item, Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "Prefetch"), "*.pf", False, False)
+                     Dim pathsToClean As String() = {Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "Prefetch")}
+                     TaskCleanFolders(item, pathsToClean, "*.pf", False, False)
 
-                  Case "Temp files (Current User)"
-                     TaskCleanFolder(item, Environment.GetEnvironmentVariable("TEMP"), "*.*", True, True)
-
-                  Case "Temp files (Windows)"
-                     TaskCleanFolder(item, Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "Temp"), "*.*", True, True)
+                  Case "Temp folder(s)"
+                     Dim pathsToClean As String() = {
+                        Environment.GetEnvironmentVariable("TEMP"),
+                        Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "Temp")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", True, True)
 
                   Case "Windows Update cache"
-                     ' Stop services: wuauserv, bits, cryptsvc, msiserver
-                     ' delete C:\Windows\SoftwareDistribution\Download
-                     ' delete C:\Windows\SoftwareDistribution\DataStore
-                     'start services - reverse order
                      StopService("wuauserv")
                      StopService("bits")
                      StopService("cryptsvc")
                      StopService("msiserver")
+                     Await Task.Delay(5000)
                      Dim pathsToClean As String() = {
                         Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "SoftwareDistribution\Download"),
                         Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "SoftwareDistribution\DataStore")
                      }
                      TaskCleanFolders(item, pathsToClean, "*.*", True, True)
-                     Await Task.Delay(5000)
                      StartService("msiserver")
                      StartService("cryptsvc")
                      StartService("bits")
@@ -137,15 +168,26 @@ Public Class frmSysPurge
 
                End Select
 
-            Case "Microsoft Windows Registry"
+            Case "Microsoft Windows » Registry" '--------------------------------------------------
                Select Case item.Text
                   Case "MRU list: Run"
                      TaskCleanRegValues(item, Registry.CurrentUser, "Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU", False)
 
                   Case "Shared DLL's)"
                      '
+               End Select
+
+            Case "Microsoft Teams" '---------------------------------------------------------------
+               Select Case item.Text
+                  Case "Cache"
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Teams"),
+                        Path.Combine(Environment.GetEnvironmentVariable("localappdata"), "Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", True, True)
 
                End Select
+
          End Select
       Next
    End Sub
@@ -187,76 +229,17 @@ Public Class frmSysPurge
    End Sub
 
    '-----------------------------------------------------------------------------------------------
-   ' Task: Clean Folder
-   Private Sub TaskCleanFolder(item As ListViewItem, folderPath As String, mask As String, recursive As Boolean, deleteFolders As Boolean)
-      Dim deletedBytes As Long = 0
-      Dim lastUpdate As Integer = Environment.TickCount
-
-      SetTaskProgressBytes(item, deletedBytes, 0)
-
-      If Not Directory.Exists(folderPath) Then
-         SetTaskProgressBytes(item, deletedBytes, 100)
-         Return
-      End If
-
-      Dim search = If(recursive, SearchOption.AllDirectories, SearchOption.TopDirectoryOnly)
-      Dim files() As String
-
-      Try
-         files = Directory.GetFiles(folderPath, mask, search)
-      Catch
-         SetTaskProgressBytes(item, deletedBytes, 100)
-         Return
-      End Try
-
-      For i = 0 To files.Length - 1
-         Try
-            Dim fi = New FileInfo(files(i))
-            Dim size = fi.Length
-            File.Delete(files(i))
-            deletedBytes += size
-         Catch
-            ' ignore
-         End Try
-
-         Dim now = Environment.TickCount
-         If now - lastUpdate >= 25 Then
-            Dim prog = CInt((i + 1) * 100.0 / files.Length)
-            SetTaskProgressBytes(item, deletedBytes, prog)
-            lastUpdate = now
-         End If
-      Next
-
-      SetTaskProgressBytes(item, deletedBytes, 100)
-
-      If deleteFolders AndAlso recursive Then
-         Dim folders() As String = {}
-         Try
-            folders = Directory.GetDirectories(folderPath, "*", SearchOption.AllDirectories)
-         Catch
-         End Try
-
-         For i = folders.Length - 1 To 0 Step -1
-            Try
-               Directory.Delete(folders(i), False)
-            Catch
-            End Try
-         Next
-      End If
-   End Sub
-
-   '-----------------------------------------------------------------------------------------------
-   ' Task: Clean Folder
+   ' Task: Clean Folders
    Private Sub TaskCleanFolders(item As ListViewItem, folderPaths As IEnumerable(Of String), mask As String, recursive As Boolean, deleteFolders As Boolean)
       Dim totalDeletedBytes As Long = 0
       Dim lastUpdate As Integer = Environment.TickCount
 
       ' Convert to list to avoid multiple enumerations
       Dim pathsList = folderPaths.ToList()
-
+      MessageBox.Show("Number of paths to process: " & pathsList.Count.ToString())
       For Each folderPath As String In pathsList
          If Not Directory.Exists(folderPath) Then Continue For
-
+         MessageBox.Show(folderPath)
          Dim search = If(recursive, SearchOption.AllDirectories, SearchOption.TopDirectoryOnly)
          Dim files() As String
          Try
@@ -364,9 +347,10 @@ Public Class frmSysPurge
    '-----------------------------------------------------------------------------------------------
    ' frmSysPurge: onLoad
    Private Sub frmSysPurge_Load(sender As Object, e As EventArgs) Handles Me.Load
-      BuildOptions()
-
+      Me.Text = appName & " " & appVersion & " " & appAuthor
       SendMessage(lvSysPurge.Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, CType(LVS_EX_DOUBLEBUFFER, IntPtr), CType(LVS_EX_DOUBLEBUFFER, IntPtr))
+
+      BuildOptions()
    End Sub
 
    '-----------------------------------------------------------------------------------------------
