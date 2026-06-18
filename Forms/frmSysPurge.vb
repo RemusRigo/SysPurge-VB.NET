@@ -77,10 +77,11 @@ Public Class frmSysPurge
 
    '-----------------------------------------------------------------------------------------------
    ' Add ListView item
-   Private Sub LV_AddItem(name As String)
+   Private Sub LV_AddItem(name As String, isChecked As Boolean)
       Dim item As New ListViewItem(name)
       item.SubItems.Add("")
       item.SubItems.Add("")
+      item.Checked = isChecked
       item.Tag = 0
       item.Group = grp
       lvSysPurge.Items.Add(item)
@@ -94,19 +95,19 @@ Public Class frmSysPurge
       lvSysPurge.Groups.Clear()
 
       LV_AddGroup("Microsoft Windows » FileSystem")
-      If IsAppElevated() Then LV_AddItem("EventViewer logs")
-      LV_AddItem("Log files (inside Windows)")
-      LV_AddItem("Log files (System drive)")
-      LV_AddItem("Prefetch files")
-      LV_AddItem("Temp folder(s)")
-      If IsAppElevated() Then LV_AddItem("Windows Update cache")
+      If IsAppElevated() Then LV_AddItem("EventViewer logs", True)
+      LV_AddItem("Log files (inside Windows)", True)
+      LV_AddItem("Log files (System drive)", False)
+      LV_AddItem("Prefetch files", True)
+      LV_AddItem("Temp folder(s)", True)
+      If IsAppElevated() Then LV_AddItem("Windows Update cache", False)
 
       LV_AddGroup("Microsoft Windows » Registry")
-      LV_AddItem("MRU list: Run")
-      If IsAppElevated() Then LV_AddItem("Shared DLL's)")
+      LV_AddItem("MRU list: Run", True)
+      If IsAppElevated() Then LV_AddItem("Shared DLL's)", True)
 
       LV_AddGroup("Microsoft Teams")
-      LV_AddItem("Cache")
+      LV_AddItem("Cache", True)
 
       ResizeColumns()
       lvSysPurge.EndUpdate()
