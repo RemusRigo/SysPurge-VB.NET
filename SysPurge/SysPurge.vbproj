@@ -47,8 +47,11 @@
    <None Remove=".gitattributes" />
    <None Remove=".gitignore" />
    <None Remove="Add Package.bat" />
+   <None Remove="desktop.ini" />
    <None Remove="FUNDING.yml" />
    <None Remove="LICENSE.txt" />
+   <None Remove="Sync.bat" />
+   <None Remove="Sync.ps1" />
    <None Remove="Update.bat" />
    <None Remove="Upload.bat" />
    <None Remove="Upload.ps1" />
