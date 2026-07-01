@@ -28,6 +28,7 @@ A Windows cleaning tool
 * Clean Microsoft Event Viewer logs
 * Clean Microsoft Registry missing shared Dll's
 * Clean Microsoft Registry MRU
+* Clean Microsoft PowerShell
 * Clean Microsoft Teams cache
 
 
@@ -42,6 +43,9 @@ A Windows cleaning tool
 
 ## Roadmap
 
+* 2026-06-30: Add: Log class to report errors/warnings/info
+* 2026-06-30: Add: Clear Recent files
+* 2026-06-30: Add: Clear PowerShell Console Host History
 * 2026-06-14: Add: Clear Microsoft Teams cache
 * 2026-06-13: Add: New Task for clearing folders to support multiple paths
 * 2026-06-13: Add: BlueFlame.ico
