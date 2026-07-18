@@ -43,6 +43,9 @@ A Windows cleaning tool
 
 ## Roadmap
 
+* 2026-07-18: Add: Clear Google Chrome Software Reporter Tool logs
+* 2026-07-18: Add: Clear privacy.sexy runs
+* 2026-07-18: Add: Clear privacy.sexy logs
 * 2026-06-30: Add: Log class to report errors/warnings/info
 * 2026-06-30: Add: Clear Recent files
 * 2026-06-30: Add: Clear PowerShell Console Host History

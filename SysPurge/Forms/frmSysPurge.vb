@@ -102,7 +102,7 @@ Public Class frmSysPurge
       LV_AddItem("Log files (inside Windows)", True)
       LV_AddItem("Log files (System drive)", False)
       LV_AddItem("Prefetch files", True)
-      LV_AddItem("Recent files", True)
+      LV_AddItem("Recent Items", True)
       LV_AddItem("Temp folder(s)", True)
       If IsAppElevated() Then LV_AddItem("Windows Update cache", False)
 
@@ -123,7 +123,31 @@ Public Class frmSysPurge
       LV_AddItem("Cache", True)
 
       LV_AddGroup("Microsoft PowerShell")
-      LV_AddItem("Cosole Host History", True)
+      LV_AddItem("Console Host History", True)
+
+      LV_AddGroup("Microsoft .NET")
+      LV_AddItem("Telemetry data", True)
+
+      LV_AddGroup("Microsoft Visual Studio")
+      LV_AddItem("Telemetry data", True)
+
+      '============================================================================================
+
+      LV_AddGroup("Google")
+      LV_AddItem("Crash Reports", True)
+
+      LV_AddGroup("Google Chrome")
+      LV_AddItem("Crash Reports", True)
+      LV_AddItem("Software Reporter Tool: Logs", True)
+
+      '============================================================================================
+
+      LV_AddGroup("Java")
+      LV_AddItem("cache", True)
+
+      LV_AddGroup("privacy.sexy")
+      LV_AddItem("runs", True)
+      LV_AddItem("logs", True)
 
       '--------------------------------------------------------------------------------------------
 
@@ -170,7 +194,7 @@ Public Class frmSysPurge
                      TaskCleanFolders(item, pathsToClean, "*.pf", False, False)
 
                   Case "Recent files"
-                     log.Msg.Info("Clean: Microsoft Windows » FileSystem: Recent files")
+                     log.Msg.Info("Clean: Microsoft Windows » FileSystem: Recent Items")
                      Dim pathsToClean As String() = {Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent")}
                      TaskCleanFolders(item, pathsToClean, "*.*", False, False)
 
@@ -236,7 +260,6 @@ Public Class frmSysPurge
                End Select
             '--------------------------------------------------------------------------------------
             Case "Microsoft Teams"
-
                Select Case item.Text
                   Case "Cache"
                      log.Msg.Info("Clean: Microsoft Teams: Cache")
@@ -245,21 +268,97 @@ Public Class frmSysPurge
                         Path.Combine(Environment.GetEnvironmentVariable("localappdata"), "Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams")
                      }
                      TaskCleanFolders(item, pathsToClean, "*.*", True, True)
-
                End Select
 
             '--------------------------------------------------------------------------------------
             Case "Microsoft PowerShell"
-
                Select Case item.Text
-                  Case "Cosole Host History" ' ConsoleHost_history.txt | history_YYYYMMDD.json
-                     log.Msg.Info("Clean: Microsoft PowerShell: Cosole Host History")
+                  Case "Console Host History" ' ConsoleHost_history.txt | history_YYYYMMDD.json
+                     log.Msg.Info("Clean: Microsoft PowerShell: Console Host History")
                      Dim pathsToClean As String() = {
                         Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\PowerShell\PSReadLine"),
                         Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\PowerShell\PSReadLine")
                      }
                      TaskCleanFolders(item, pathsToClean, "*.*", False, False)
+               End Select
 
+            '--------------------------------------------------------------------------------------
+            Case "Microsoft .NET"
+               Select Case item.Text
+                  Case "Telemetry data"
+                     log.Msg.Info("Clean: Microsoft .NET: Telemetry data")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), ".dotnet\TelemetryStorageService")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", False, False)
+               End Select
+
+            '--------------------------------------------------------------------------------------
+            Case "Microsoft Visual Studio"
+               Select Case item.Text
+                  Case "Telemetry data"
+                     log.Msg.Info("Clean: Microsoft Visual Studio: Telemetry data")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "vstelemetry"),
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Temp\VSTelem"),
+                        Path.Combine(Environment.GetEnvironmentVariable("%PROGRAMDATA"), "vstelemetry")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", False, False)
+               End Select
+
+            '======================================================================================
+            Case "Google"
+               Select Case item.Text
+                  Case "Crash Reports"
+                     log.Msg.Info("Clean: Google: Crash Reports")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Google\CrashReports")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.log", False, False)
+               End Select
+
+            Case "Google Chrome"
+                     Select Case item.Text
+                  Case "Crash Reports"
+                     log.Msg.Info("Clean: Google Chrome: Crash Reports")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Google\Chrome\User Data\Crashpad\reports")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.log", False, False)
+                  Case "Software Reporter Tool: Logs"
+                     log.Msg.Info("Clean: Google Chrome: Software Reporter Tool: Logs")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Google\Software Reporter Tool")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.log", False, False)
+               End Select
+
+            '======================================================================================
+            Case "Java"
+               Select Case item.Text
+                  Case "cache"
+                     log.Msg.Info("Clean: Java: cache")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Sun\Java\Deployment\cache")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", False, False)
+
+               End Select
+
+            Case "privacy.sexy"
+               Select Case item.Text
+                  Case "runs"
+                     log.Msg.Info("Clean: privacy.sexy: runs")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "privacy.sexy\runs")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", False, False)
+                  Case "logs"
+                     log.Msg.Info("Clean: privacy.sexy: logs")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "privacy.sexy\logs")
+                     }
+                     TaskCleanFolders(item, pathsToClean, "*.*", False, False)
                End Select
 
          End Select
