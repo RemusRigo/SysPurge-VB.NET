@@ -43,6 +43,7 @@ A Windows cleaning tool
 
 ## Roadmap
 
+* 2026-07-21: Update: Change UI / split into multiple forms
 * 2026-07-18: Add: Clear Google Chrome Software Reporter Tool logs
 * 2026-07-18: Add: Clear privacy.sexy runs
 * 2026-07-18: Add: Clear privacy.sexy logs

@@ -1,10 +1,10 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class frmSysPurge
    Inherits System.Windows.Forms.Form
 
    'Form overrides dispose to clean up the component list.
-   <System.Diagnostics.DebuggerNonUserCode()>
-   Protected Overrides Sub Dispose(disposing As Boolean)
+   <System.Diagnostics.DebuggerNonUserCode()> _
+   Protected Overrides Sub Dispose(ByVal disposing As Boolean)
       Try
          If disposing AndAlso components IsNot Nothing Then
             components.Dispose()
@@ -18,96 +18,62 @@ Partial Class frmSysPurge
    Private components As System.ComponentModel.IContainer
 
    'NOTE: The following procedure is required by the Windows Form Designer
-   'It can be modified using the Windows Form Designer.
+   'It can be modified using the Windows Form Designer.  
    'Do not modify it using the code editor.
-   <System.Diagnostics.DebuggerStepThrough()>
+   <System.Diagnostics.DebuggerStepThrough()> _
    Private Sub InitializeComponent()
-      Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSysPurge))
-      lvSysPurge = New ListView()
-      ColumnHeader1 = New ColumnHeader()
-      ColumnHeader2 = New ColumnHeader()
-      ColumnHeader3 = New ColumnHeader()
-      ToolStrip1 = New ToolStrip()
-      btnTSPurge = New ToolStripButton()
-      StatusStrip1 = New StatusStrip()
-      ToolStrip1.SuspendLayout()
+      Dim TreeNode1 As TreeNode = New TreeNode("File System")
+      Dim TreeNode2 As TreeNode = New TreeNode("Registry")
+      Dim TreeNode3 As TreeNode = New TreeNode("Microsoft Windows", New TreeNode() {TreeNode1, TreeNode2})
+      scSysPurge = New SplitContainer()
+      tvOptions = New TreeView()
+      CType(scSysPurge, ComponentModel.ISupportInitialize).BeginInit()
+      scSysPurge.Panel1.SuspendLayout()
+      scSysPurge.SuspendLayout()
       SuspendLayout()
       ' 
-      ' lvSysPurge
+      ' scSysPurge
       ' 
-      lvSysPurge.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-      lvSysPurge.CheckBoxes = True
-      lvSysPurge.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2, ColumnHeader3})
-      lvSysPurge.FullRowSelect = True
-      lvSysPurge.Location = New Point(0, 28)
-      lvSysPurge.Name = "lvSysPurge"
-      lvSysPurge.OwnerDraw = True
-      lvSysPurge.Size = New Size(809, 317)
-      lvSysPurge.TabIndex = 0
-      lvSysPurge.UseCompatibleStateImageBehavior = False
-      lvSysPurge.View = View.Details
+      scSysPurge.Dock = DockStyle.Fill
+      scSysPurge.Location = New Point(0, 0)
+      scSysPurge.Name = "scSysPurge"
       ' 
-      ' ColumnHeader1
+      ' scSysPurge.Panel1
       ' 
-      ColumnHeader1.Text = "Action"
+      scSysPurge.Panel1.Controls.Add(tvOptions)
+      scSysPurge.Size = New Size(800, 450)
+      scSysPurge.SplitterDistance = 162
+      scSysPurge.TabIndex = 0
       ' 
-      ' ColumnHeader2
+      ' tvOptions
       ' 
-      ColumnHeader2.Text = "Result"
-      ' 
-      ' ColumnHeader3
-      ' 
-      ColumnHeader3.Text = "Progress"
-      ' 
-      ' ToolStrip1
-      ' 
-      ToolStrip1.Items.AddRange(New ToolStripItem() {btnTSPurge})
-      ToolStrip1.Location = New Point(0, 0)
-      ToolStrip1.Name = "ToolStrip1"
-      ToolStrip1.Size = New Size(809, 25)
-      ToolStrip1.TabIndex = 1
-      ToolStrip1.Text = "ToolStrip1"
-      ' 
-      ' btnTSPurge
-      ' 
-      btnTSPurge.DisplayStyle = ToolStripItemDisplayStyle.Image
-      btnTSPurge.Image = CType(resources.GetObject("btnTSPurge.Image"), Image)
-      btnTSPurge.ImageTransparentColor = Color.Magenta
-      btnTSPurge.Name = "btnTSPurge"
-      btnTSPurge.Size = New Size(23, 22)
-      btnTSPurge.Text = "ToolStripButton1"
-      ' 
-      ' StatusStrip1
-      ' 
-      StatusStrip1.Location = New Point(0, 348)
-      StatusStrip1.Name = "StatusStrip1"
-      StatusStrip1.Size = New Size(809, 22)
-      StatusStrip1.TabIndex = 2
-      StatusStrip1.Text = "StatusStrip1"
+      tvOptions.Dock = DockStyle.Fill
+      tvOptions.Location = New Point(0, 0)
+      tvOptions.Name = "tvOptions"
+      TreeNode1.Name = "Node0"
+      TreeNode1.Text = "File System"
+      TreeNode2.Name = "Node1"
+      TreeNode2.Text = "Registry"
+      TreeNode3.Name = "Node2"
+      TreeNode3.Text = "Microsoft Windows"
+      tvOptions.Nodes.AddRange(New TreeNode() {TreeNode3})
+      tvOptions.Size = New Size(162, 450)
+      tvOptions.TabIndex = 0
       ' 
       ' frmSysPurge
       ' 
       AutoScaleDimensions = New SizeF(7F, 15F)
       AutoScaleMode = AutoScaleMode.Font
-      ClientSize = New Size(809, 370)
-      Controls.Add(StatusStrip1)
-      Controls.Add(ToolStrip1)
-      Controls.Add(lvSysPurge)
-      Icon = CType(resources.GetObject("$this.Icon"), Icon)
+      ClientSize = New Size(800, 450)
+      Controls.Add(scSysPurge)
       Name = "frmSysPurge"
-      Text = "SysPurge"
-      ToolStrip1.ResumeLayout(False)
-      ToolStrip1.PerformLayout()
+      Text = "Form1"
+      scSysPurge.Panel1.ResumeLayout(False)
+      CType(scSysPurge, ComponentModel.ISupportInitialize).EndInit()
+      scSysPurge.ResumeLayout(False)
       ResumeLayout(False)
-      PerformLayout()
    End Sub
 
-   Friend WithEvents lvSysPurge As ListView
-   Friend WithEvents ColumnHeader1 As ColumnHeader
-   Friend WithEvents ColumnHeader2 As ColumnHeader
-   Friend WithEvents ColumnHeader3 As ColumnHeader
-   Friend WithEvents ToolStrip1 As ToolStrip
-   Friend WithEvents btnTSPurge As ToolStripButton
-   Friend WithEvents StatusStrip1 As StatusStrip
-
+   Friend WithEvents scSysPurge As SplitContainer
+   Friend WithEvents tvOptions As TreeView
 End Class
