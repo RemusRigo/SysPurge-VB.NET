@@ -77,7 +77,7 @@ Public Class frmReg
 
    '-----------------------------------------------------------------------------------------------
    ' Process Actions
-   Private Async Sub ProcessActions(itemsToProcess As List(Of ListViewItem))
+   Private Sub ProcessActions(itemsToProcess As List(Of ListViewItem))
       For Each item As ListViewItem In itemsToProcess
          Dim grp = item.Group
          If grp Is Nothing Then Continue For
