@@ -1,5 +1,5 @@
 ﻿'--------------------------------------------------------------------------------------------------
-' SysPurge: frmFS.vb - Clean File System
+' SysPurge: frmApps.vb - Clean Known/Installed Applications
 '    © 2026 Remus Rigo
 '       v1.1.20260724
 '--------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ Imports System.Text.RegularExpressions
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports Microsoft.Win32
 
-Public Class frmFS
+Public Class frmApps
 
    Dim grp As ListViewGroup = Nothing
    Dim log As New Logger(appName)
@@ -20,7 +20,7 @@ Public Class frmFS
    ' Add ListView Group
    Private Sub LV_AddGroup(name As String)
       grp = New ListViewGroup(name)
-      lvFS.Groups.Add(grp)
+      lvApps.Groups.Add(grp)
    End Sub
 
    '-----------------------------------------------------------------------------------------------
@@ -32,32 +32,32 @@ Public Class frmFS
       item.Checked = isChecked
       item.Tag = 0
       item.Group = grp
-      lvFS.Items.Add(item)
+      lvApps.Items.Add(item)
    End Sub
 
    '-----------------------------------------------------------------------------------------------
    ' Build Options
    Public Sub BuildOptions()
-      lvFS.BeginUpdate()
-      lvFS.Items.Clear()
-      lvFS.Groups.Clear()
+      lvApps.BeginUpdate()
+      lvApps.Items.Clear()
+      lvApps.Groups.Clear()
 
-      LV_AddGroup("Temporary/Junk files")
-      LV_AddItem("User Temp folder", True)
-      LV_AddItem("System Temp folder", True)
-      LV_AddItem("Log files (inside Windows)", True)
-      LV_AddItem("Log files (System drive)", False)
+      LV_AddGroup("Google")
+      LV_AddItem("Crash Reports", True)
 
-      LV_AddGroup("Microsoft Windows FileSystem")
-      LV_AddItem("Jump List", True)
-      LV_AddItem("Prefetch files", True)
-      LV_AddItem("Recent Items", True)
-      If IsAppElevated() Then LV_AddItem("Windows Update cache", False)
+      LV_AddGroup("Google Chrome")
+      LV_AddItem("Crash Reports", True)
+      LV_AddItem("Software Reporter Tool: Logs", True)
 
-      '--------------------------------------------------------------------------------------------
+      LV_AddGroup("Java")
+      LV_AddItem("cache", True)
 
-      ResizeListViewColumns(lvFS)
-      lvFS.EndUpdate()
+      LV_AddGroup("privacy.sexy")
+      LV_AddItem("runs", True)
+      LV_AddItem("logs", True)
+
+      ResizeListViewColumns(lvApps)
+      lvApps.EndUpdate()
    End Sub
 
    '-----------------------------------------------------------------------------------------------
@@ -67,79 +67,65 @@ Public Class frmFS
          Dim grp = item.Group
          If grp Is Nothing Then Continue For
 
+         Await Task.Delay(1)
+
          Select Case grp.Header
+
             '--------------------------------------------------------------------------------------
-            Case "Temporary/Junk files"
+            Case "Google"
                Select Case item.Text
-                  Case "User Temp folder"
-                     log.Msg.Info("Clean: Microsoft Windows » FileSystem: User Temp folder")
+                  Case "Crash Reports"
+                     log.Msg.Info("Clean: Google: Crash Reports")
                      Dim pathsToClean As String() = {
-                        Environment.GetEnvironmentVariable("TEMP")
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Google\CrashReports")
                      }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.*", True, True)
+                     TaskCleanFolders(lvApps, item, pathsToClean, "*.log", False, False)
+               End Select
 
-                  Case "System Temp folder"
-                     log.Msg.Info("Clean: Microsoft Windows » FileSystem: System Temp folder")
+            Case "Google Chrome"
+               Select Case item.Text
+                  Case "Crash Reports"
+                     log.Msg.Info("Clean: Google Chrome: Crash Reports")
                      Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "Temp")
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Google\Chrome\User Data\Crashpad\reports")
                      }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.*", True, True)
+                     TaskCleanFolders(lvApps, item, pathsToClean, "*.log", False, False)
 
-                  Case "Log files (inside Windows)"
-                     log.Msg.Info("Clean: Temporary/Junk files: Log files (inside Windows)")
+                  Case "Software Reporter Tool: Logs"
+                     log.Msg.Info("Clean: Google Chrome: Software Reporter Tool: Logs")
                      Dim pathsToClean As String() = {
-                        Environment.GetEnvironmentVariable("SystemRoot")
+                        Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "Google\Software Reporter Tool")
                      }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.log", True, True)
-
-                  Case "Log files (System drive)"
-                     log.Msg.Info("Clean: Temporary/Junk files: Log files (System drive)")
-                     Dim pathsToClean As String() = {
-                        Environment.GetEnvironmentVariable("SystemDrive")
-                     }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.log", True, True)
-
+                     TaskCleanFolders(lvApps, item, pathsToClean, "*.log", False, False)
                End Select
 
             '--------------------------------------------------------------------------------------
-            Case "Microsoft Windows FileSystem"
+            Case "Java"
                Select Case item.Text
-
-                  Case "Jump List"
-                     log.Msg.Info("Clean: Microsoft Windows FileSystem: Jump List")
+                  Case "cache"
+                     log.Msg.Info("Clean: Java: cache")
                      Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent\AutomaticDestinations"),
-                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent\CustomDestinations")
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Sun\Java\Deployment\cache")
                      }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.automaticDestinations-ms", False, False)
+                     TaskCleanFolders(lvApps, item, pathsToClean, "*.*", False, False)
+               End Select
 
-                  Case "Prefetch files"
-                     log.Msg.Info("Clean: Microsoft Windows FileSystem: Prefetch files")
-                     Dim pathsToClean As String() = {Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "Prefetch")}
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.pf", False, False)
-
-                  Case "Recent files"
-                     log.Msg.Info("Clean: Microsoft Windows FileSystem: Recent Items")
-                     Dim pathsToClean As String() = {Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent")}
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.*", False, False)
-
-                  Case "Windows Update cache"
-                     log.Msg.Info("Clean: Microsoft Windows FileSystem: Windows Update cache")
-                     StopService("wuauserv")
-                     StopService("bits")
-                     StopService("cryptsvc")
-                     StopService("msiserver")
-                     Await Task.Delay(5000)
+            '--------------------------------------------------------------------------------------
+            Case "privacy.sexy"
+               Select Case item.Text
+                  Case "runs"
+                     log.Msg.Info("Clean: privacy.sexy: runs")
                      Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "SoftwareDistribution\Download"),
-                        Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "SoftwareDistribution\DataStore")
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "privacy.sexy\runs")
                      }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.*", True, True)
-                     StartService("msiserver")
-                     StartService("cryptsvc")
-                     StartService("bits")
-                     StartService("wuauserv")
+                     TaskCleanFolders(lvApps, item, pathsToClean, "*.*", False, False)
 
+                  Case "logs"
+                     log.Msg.Info("Clean: privacy.sexy: logs")
+                     Dim pathsToClean As String() = {
+                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "privacy.sexy\logs")
+                     }
+                     TaskCleanFolders(lvApps, item, pathsToClean, "*.*", False, False)
                End Select
 
          End Select
@@ -150,17 +136,17 @@ Public Class frmFS
    ' frmSysPurge: onLoad
    Private Sub frmSysPurge_Load(sender As Object, e As EventArgs) Handles Me.Load
       Me.Text = appName & " " & appVersion & " " & appAuthor
-      SendMessage(lvFS.Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, CType(LVS_EX_DOUBLEBUFFER, IntPtr), CType(LVS_EX_DOUBLEBUFFER, IntPtr))
+      SendMessage(lvApps.Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, CType(LVS_EX_DOUBLEBUFFER, IntPtr), CType(LVS_EX_DOUBLEBUFFER, IntPtr))
 
       BuildOptions()
    End Sub
 
    '-----------------------------------------------------------------------------------------------
    ' btnTSPurge: onClick
-   Private Async Sub btnTSPurge_Click(sender As Object, e As EventArgs) Handles btnFSRun.Click
+   Private Async Sub btnTSPurge_Click(sender As Object, e As EventArgs) Handles btnAppsRun.Click
       ' 1. Gather the items to process on the UI thread
       Dim itemsToProcess As New List(Of ListViewItem)()
-      For Each item As ListViewItem In lvFS.Items
+      For Each item As ListViewItem In lvApps.Items
          If item.Checked AndAlso item.Group IsNot Nothing Then
             itemsToProcess.Add(item)
          End If
@@ -176,20 +162,20 @@ Public Class frmFS
 
    '-----------------------------------------------------------------------------------------------
    ' lvSysPurge: DrawColumnHeader
-   Private Sub lvSysPurge_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles lvFS.DrawColumnHeader
+   Private Sub lvSysPurge_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles lvApps.DrawColumnHeader
       ' draw column headers with default style
       e.DrawDefault = True
    End Sub
 
    '-----------------------------------------------------------------------------------------------
    ' lvSysPurge: DrawItem
-   Private Sub lvSysPurge_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles lvFS.DrawItem
+   Private Sub lvSysPurge_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles lvApps.DrawItem
       ' draw items with default style (except subitem 2 which is handled in DrawSubItem)
    End Sub
 
    '-----------------------------------------------------------------------------------------------
    ' lvSysPurge: DrawSubItem
-   Private Sub lvSysPurge_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles lvFS.DrawSubItem
+   Private Sub lvSysPurge_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles lvApps.DrawSubItem
       ' column 3 (index 2)
       If e.ColumnIndex <> 2 Then
          e.DrawDefault = True
@@ -207,7 +193,7 @@ Public Class frmFS
       Dim r As RECT
       r.Top = e.ColumnIndex
       r.Left = LVIR_BOUNDS
-      SendMessage(lvFS.Handle, LVM_GETSUBITEMRECT, CType(e.ItemIndex, IntPtr), r)
+      SendMessage(lvApps.Handle, LVM_GETSUBITEMRECT, CType(e.ItemIndex, IntPtr), r)
 
       Dim rect = Rectangle.FromLTRB(r.Left, r.Top, r.Right, r.Bottom)
       rect.Inflate(-PADDING_H, -PADDING_V)
@@ -240,7 +226,7 @@ Public Class frmFS
 
       If progress > 0 Then
          Dim text = progress.ToString() & "%"
-         TextRenderer.DrawText(g, text, lvFS.Font, rect, Color.Black,
+         TextRenderer.DrawText(g, text, lvApps.Font, rect, Color.Black,
                                   TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
       End If
    End Sub

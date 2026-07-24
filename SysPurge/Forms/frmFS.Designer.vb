@@ -23,29 +23,29 @@ Partial Class frmFS
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFS))
-      lvSysPurge = New ListView()
+      lvFS = New ListView()
       ColumnHeader1 = New ColumnHeader()
       ColumnHeader2 = New ColumnHeader()
       ColumnHeader3 = New ColumnHeader()
-      ToolStrip1 = New ToolStrip()
-      btnTSPurge = New ToolStripButton()
+      tsFS = New ToolStrip()
+      btnFSRun = New ToolStripButton()
       StatusStrip1 = New StatusStrip()
-      ToolStrip1.SuspendLayout()
+      tsFS.SuspendLayout()
       SuspendLayout()
       ' 
-      ' lvSysPurge
+      ' lvFS
       ' 
-      lvSysPurge.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-      lvSysPurge.CheckBoxes = True
-      lvSysPurge.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2, ColumnHeader3})
-      lvSysPurge.FullRowSelect = True
-      lvSysPurge.Location = New Point(0, 28)
-      lvSysPurge.Name = "lvSysPurge"
-      lvSysPurge.OwnerDraw = True
-      lvSysPurge.Size = New Size(809, 317)
-      lvSysPurge.TabIndex = 0
-      lvSysPurge.UseCompatibleStateImageBehavior = False
-      lvSysPurge.View = View.Details
+      lvFS.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+      lvFS.CheckBoxes = True
+      lvFS.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2, ColumnHeader3})
+      lvFS.FullRowSelect = True
+      lvFS.Location = New Point(0, 28)
+      lvFS.Name = "lvFS"
+      lvFS.OwnerDraw = True
+      lvFS.Size = New Size(807, 317)
+      lvFS.TabIndex = 0
+      lvFS.UseCompatibleStateImageBehavior = False
+      lvFS.View = View.Details
       ' 
       ' ColumnHeader1
       ' 
@@ -59,23 +59,23 @@ Partial Class frmFS
       ' 
       ColumnHeader3.Text = "Progress"
       ' 
-      ' ToolStrip1
+      ' tsFS
       ' 
-      ToolStrip1.Items.AddRange(New ToolStripItem() {btnTSPurge})
-      ToolStrip1.Location = New Point(0, 0)
-      ToolStrip1.Name = "ToolStrip1"
-      ToolStrip1.Size = New Size(809, 25)
-      ToolStrip1.TabIndex = 1
-      ToolStrip1.Text = "ToolStrip1"
+      tsFS.Items.AddRange(New ToolStripItem() {btnFSRun})
+      tsFS.Location = New Point(0, 0)
+      tsFS.Name = "tsFS"
+      tsFS.Size = New Size(809, 25)
+      tsFS.TabIndex = 1
+      tsFS.Text = "ToolStrip1"
       ' 
-      ' btnTSPurge
+      ' btnFSRun
       ' 
-      btnTSPurge.DisplayStyle = ToolStripItemDisplayStyle.Image
-      btnTSPurge.Image = CType(resources.GetObject("btnTSPurge.Image"), Image)
-      btnTSPurge.ImageTransparentColor = Color.Magenta
-      btnTSPurge.Name = "btnTSPurge"
-      btnTSPurge.Size = New Size(23, 22)
-      btnTSPurge.Text = "ToolStripButton1"
+      btnFSRun.DisplayStyle = ToolStripItemDisplayStyle.Image
+      btnFSRun.Image = CType(resources.GetObject("btnFSRun.Image"), Image)
+      btnFSRun.ImageTransparentColor = Color.Magenta
+      btnFSRun.Name = "btnFSRun"
+      btnFSRun.Size = New Size(23, 22)
+      btnFSRun.Text = "ToolStripButton1"
       ' 
       ' StatusStrip1
       ' 
@@ -85,29 +85,29 @@ Partial Class frmFS
       StatusStrip1.TabIndex = 2
       StatusStrip1.Text = "StatusStrip1"
       ' 
-      ' frmSysPurge
+      ' frmFS
       ' 
       AutoScaleDimensions = New SizeF(7F, 15F)
       AutoScaleMode = AutoScaleMode.Font
       ClientSize = New Size(809, 370)
       Controls.Add(StatusStrip1)
-      Controls.Add(ToolStrip1)
-      Controls.Add(lvSysPurge)
+      Controls.Add(tsFS)
+      Controls.Add(lvFS)
       Icon = CType(resources.GetObject("$this.Icon"), Icon)
-      Name = "frmSysPurge"
+      Name = "frmFS"
       Text = "SysPurge"
-      ToolStrip1.ResumeLayout(False)
-      ToolStrip1.PerformLayout()
+      tsFS.ResumeLayout(False)
+      tsFS.PerformLayout()
       ResumeLayout(False)
       PerformLayout()
    End Sub
 
-   Friend WithEvents lvSysPurge As ListView
+   Friend WithEvents lvFS As ListView
    Friend WithEvents ColumnHeader1 As ColumnHeader
    Friend WithEvents ColumnHeader2 As ColumnHeader
    Friend WithEvents ColumnHeader3 As ColumnHeader
-   Friend WithEvents ToolStrip1 As ToolStrip
-   Friend WithEvents btnTSPurge As ToolStripButton
+   Friend WithEvents tsFS As ToolStrip
+   Friend WithEvents btnFSRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip
 
 End Class

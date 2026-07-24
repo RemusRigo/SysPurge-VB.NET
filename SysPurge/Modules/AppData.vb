@@ -11,6 +11,6 @@ Module AppData
    Public Const appBuild As String = "20260625"
    Public Const appAuthor As String = "Remus Rigo"
    Public Const appLink As String = "© 2026 " & appAuthor
-   Public Const appTitle As String = appVersion & "'s " & appName & appVersion & "-" & appBuild
+   Public Const appTitle As String = appAuthor & "'s " & appName & appVersion & "." & appBuild
 
 End Module

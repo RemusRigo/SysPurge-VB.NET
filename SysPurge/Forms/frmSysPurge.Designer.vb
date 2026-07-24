@@ -22,15 +22,12 @@ Partial Class frmSysPurge
    'Do not modify it using the code editor.
    <System.Diagnostics.DebuggerStepThrough()> _
    Private Sub InitializeComponent()
-      Dim TreeNode1 As TreeNode = New TreeNode("File System")
-      Dim TreeNode2 As TreeNode = New TreeNode("Registry")
-      Dim TreeNode3 As TreeNode = New TreeNode("Microsoft Windows", New TreeNode() {TreeNode1, TreeNode2})
+      Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSysPurge))
       scSysPurge = New SplitContainer()
-      tvOptions = New TreeView()
+      btnApps = New Button()
+      btnMSApps = New Button()
+      btnReg = New Button()
       btnFS = New Button()
-      Button1 = New Button()
-      Button2 = New Button()
-      Button3 = New Button()
       CType(scSysPurge, ComponentModel.ISupportInitialize).BeginInit()
       scSysPurge.Panel1.SuspendLayout()
       scSysPurge.SuspendLayout()
@@ -38,79 +35,78 @@ Partial Class frmSysPurge
       ' 
       ' scSysPurge
       ' 
-      scSysPurge.Dock = DockStyle.Fill
+      scSysPurge.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+      scSysPurge.FixedPanel = FixedPanel.Panel1
+      scSysPurge.IsSplitterFixed = True
       scSysPurge.Location = New Point(0, 0)
       scSysPurge.Name = "scSysPurge"
       ' 
       ' scSysPurge.Panel1
       ' 
-      scSysPurge.Panel1.Controls.Add(Button3)
-      scSysPurge.Panel1.Controls.Add(Button2)
-      scSysPurge.Panel1.Controls.Add(Button1)
+      scSysPurge.Panel1.Controls.Add(btnApps)
+      scSysPurge.Panel1.Controls.Add(btnMSApps)
+      scSysPurge.Panel1.Controls.Add(btnReg)
       scSysPurge.Panel1.Controls.Add(btnFS)
-      scSysPurge.Panel1.Controls.Add(tvOptions)
-      scSysPurge.Size = New Size(800, 450)
-      scSysPurge.SplitterDistance = 74
+      scSysPurge.Size = New Size(984, 461)
+      scSysPurge.SplitterDistance = 128
       scSysPurge.TabIndex = 0
       ' 
-      ' tvOptions
+      ' btnApps
       ' 
-      tvOptions.Location = New Point(3, 318)
-      tvOptions.Name = "tvOptions"
-      TreeNode1.Name = "Node0"
-      TreeNode1.Text = "File System"
-      TreeNode2.Name = "Node1"
-      TreeNode2.Text = "Registry"
-      TreeNode3.Name = "Node2"
-      TreeNode3.Text = "Microsoft Windows"
-      tvOptions.Nodes.AddRange(New TreeNode() {TreeNode3})
-      tvOptions.Size = New Size(56, 204)
-      tvOptions.TabIndex = 0
+      btnApps.Image = CType(resources.GetObject("btnApps.Image"), Image)
+      btnApps.ImageAlign = ContentAlignment.MiddleRight
+      btnApps.Location = New Point(6, 105)
+      btnApps.Name = "btnApps"
+      btnApps.Size = New Size(120, 34)
+      btnApps.TabIndex = 4
+      btnApps.Text = "Apps"
+      btnApps.TextAlign = ContentAlignment.MiddleLeft
+      btnApps.UseVisualStyleBackColor = True
+      ' 
+      ' btnMSApps
+      ' 
+      btnMSApps.Image = CType(resources.GetObject("btnMSApps.Image"), Image)
+      btnMSApps.ImageAlign = ContentAlignment.MiddleRight
+      btnMSApps.Location = New Point(6, 71)
+      btnMSApps.Name = "btnMSApps"
+      btnMSApps.Size = New Size(120, 34)
+      btnMSApps.TabIndex = 3
+      btnMSApps.Text = "MS Apps"
+      btnMSApps.TextAlign = ContentAlignment.MiddleLeft
+      btnMSApps.UseVisualStyleBackColor = True
+      ' 
+      ' btnReg
+      ' 
+      btnReg.Image = CType(resources.GetObject("btnReg.Image"), Image)
+      btnReg.ImageAlign = ContentAlignment.MiddleRight
+      btnReg.Location = New Point(6, 37)
+      btnReg.Name = "btnReg"
+      btnReg.Size = New Size(120, 34)
+      btnReg.TabIndex = 2
+      btnReg.Text = "Registry"
+      btnReg.TextAlign = ContentAlignment.MiddleLeft
+      btnReg.UseVisualStyleBackColor = True
       ' 
       ' btnFS
       ' 
-      btnFS.Image = My.Resources.Resources.Explorer
-      btnFS.Location = New Point(3, 3)
+      btnFS.Image = CType(resources.GetObject("btnFS.Image"), Image)
+      btnFS.ImageAlign = ContentAlignment.MiddleRight
+      btnFS.Location = New Point(6, 3)
       btnFS.Name = "btnFS"
-      btnFS.Size = New Size(64, 64)
+      btnFS.Size = New Size(120, 34)
       btnFS.TabIndex = 1
+      btnFS.Text = "File System"
+      btnFS.TextAlign = ContentAlignment.MiddleLeft
       btnFS.UseVisualStyleBackColor = True
-      ' 
-      ' Button1
-      ' 
-      Button1.Image = My.Resources.Resources.Registry
-      Button1.Location = New Point(3, 73)
-      Button1.Name = "Button1"
-      Button1.Size = New Size(64, 64)
-      Button1.TabIndex = 2
-      Button1.UseVisualStyleBackColor = True
-      ' 
-      ' Button2
-      ' 
-      Button2.Image = My.Resources.Resources.Windows
-      Button2.Location = New Point(3, 143)
-      Button2.Name = "Button2"
-      Button2.Size = New Size(64, 64)
-      Button2.TabIndex = 3
-      Button2.UseVisualStyleBackColor = True
-      ' 
-      ' Button3
-      ' 
-      Button3.Image = My.Resources.Resources.Apps
-      Button3.Location = New Point(3, 213)
-      Button3.Name = "Button3"
-      Button3.Size = New Size(64, 64)
-      Button3.TabIndex = 4
-      Button3.UseVisualStyleBackColor = True
       ' 
       ' frmSysPurge
       ' 
       AutoScaleDimensions = New SizeF(7F, 15F)
       AutoScaleMode = AutoScaleMode.Font
-      ClientSize = New Size(800, 450)
+      ClientSize = New Size(984, 461)
       Controls.Add(scSysPurge)
       Name = "frmSysPurge"
-      Text = "Form1"
+      Text = "SysPurge"
       scSysPurge.Panel1.ResumeLayout(False)
       CType(scSysPurge, ComponentModel.ISupportInitialize).EndInit()
       scSysPurge.ResumeLayout(False)
@@ -118,9 +114,8 @@ Partial Class frmSysPurge
    End Sub
 
    Friend WithEvents scSysPurge As SplitContainer
-   Friend WithEvents tvOptions As TreeView
    Friend WithEvents btnFS As Button
-   Friend WithEvents Button3 As Button
-   Friend WithEvents Button2 As Button
-   Friend WithEvents Button1 As Button
+   Friend WithEvents btnApps As Button
+   Friend WithEvents btnMSApps As Button
+   Friend WithEvents btnReg As Button
 End Class

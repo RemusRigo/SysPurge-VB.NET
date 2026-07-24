@@ -59,6 +59,12 @@
 
 <ItemGroup>
    <Compile Update="Forms\frmReg.vb" />
+   <Compile Update="Forms\frmApps.vb">
+     <SubType>Form</SubType>
+   </Compile>
+   <Compile Update="Forms\frmMSApps.vb">
+     <SubType>Form</SubType>
+   </Compile>
    <Compile Update="My Project\Application.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
