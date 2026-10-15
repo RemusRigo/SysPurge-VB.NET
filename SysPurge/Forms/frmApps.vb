@@ -4,8 +4,10 @@
 '       v1.1.20260724
 '--------------------------------------------------------------------------------------------------
 
-Imports System.IO
 Imports Microsoft.Win32
+Imports System.IO
+
+Imports SysPurge.API
 
 Public Class frmApps
 

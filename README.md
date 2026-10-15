@@ -1,63 +1,64 @@
 # SysPurge
-
-A Windows cleaning tool
-
+SysPurge: a Windows cleaning tool
 
 
-## Authors
+
+## Author
 
 * [@remusrigo](https://github.com/RemusRigo)
 * [@remusrigo](https://sourceforge.net/u/remusrigo/profile)
 
 
 
-## Installation
+## Features
 
-* You must install .NET Runtime 10 x64 and then just run SysPurge.exe
+* File System:
+  * Temporary/Junk files: user and system Temp folders, log files, previous Windows installation (`Windows.old`)
+  * Microsoft Windows: Jump Lists, Prefetch files, Recent Items, Windows Update cache
+* Registry:
+  * Run MRU
+  * missing Shared DLL's
+* Microsoft Apps:
+  * .NET and Visual Studio telemetry data
+  * DirectX (shader cache, Direct3D most recent application)
+  * Event Viewer (logs)
+  * Internet Explorer (cache, cookies, temporary files, typed URLs)
+  * Microsoft Management Console (recent files)
+  * OneDrive (temp)
+  * PowerShell (console history)
+  * Teams (cache)
+  * Windows Media Player (recent files, URLs)
+* Apps:
+  * Adobe (recent files)
+  * Google / Google Chrome (crash reports, Software Reporter Tool logs)
+  * Java (cache)
+  * Media Player Classic (recent files)
+  * privacy.sexy (runs, logs)
+  * Steam (appcache, dumps, traces)
+* Options that need administrator rights are shown only when running as administrator
+* Logs actions to a file
 * Tested on:
-
   * Windows 10 Ent x64
   * Windows 11 Pro x64
 
 
 
-## Cleaning Tasks
+## User's Guide
 
-* Microsoft Windows cleaning tasks:
-
-  * logs
-  * prefetch files
-
-* Microsoft Windows Registry cleaning tasks:
-
-  * Microsoft Registry missing shared Dll's
-  * Microsoft Registry MRU
-
-* Microsoft Apps
-
-  * DirectX
-  * Event Viewer (logs)
-  * Internet Explorer (cache)
-  * OneDrive (temp)
-  * PowerShell
-  * Teams (cache)
-  * Windows Media Player (recent files, URLs)
-
-* Apps
-
-  * Google
-  * Google Chrome
-  * Java
-  * Media Player Classic
-  * privacy.sexy
-  * Steam
+See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and usage.
 
 
 
 ## Statistics
 
-![status](https://img.shields.io/badge/status-in%20progress-orange)
+![VB.NET](https://img.shields.io/badge/Language-VB.NET-blue)
+![API](https://img.shields.io/badge/API-AdvAPI32-lightblue)
+![API](https://img.shields.io/badge/API-User32-lightblue)
+![Runtime](https://img.shields.io/badge/Runtime-.NET%208.0-lightblue)
+![Runtime](https://img.shields.io/badge/Runtime-.NET%2010.0-lightblue)
+![VS](https://img.shields.io/badge/IDE-Visual%20Studio-purple)
 <br>
+![status](https://img.shields.io/badge/status-in%20progress-orange) 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/SysPurge-VB.NET/total)
 
 
@@ -90,3 +91,9 @@ A Windows cleaning tool
 * 2012-04-21: Add: Background Worker
 * 2012-04-21: Project started
 
+
+
+## History/Versions
+
+* 2010-06-04: SysCleaner written in Delphi
+* 2008-02-21: SysSweeper written in Delphi

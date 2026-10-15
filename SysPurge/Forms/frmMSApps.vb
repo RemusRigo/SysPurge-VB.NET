@@ -4,13 +4,10 @@
 '       v1.1.20260724
 '--------------------------------------------------------------------------------------------------
 
-Imports System.ComponentModel
-Imports System.Configuration
-Imports System.IO
-Imports System.Runtime
-Imports System.Text.RegularExpressions
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports Microsoft.Win32
+Imports System.IO
+
+Imports SysPurge.API
 
 Public Class frmMSApps
 

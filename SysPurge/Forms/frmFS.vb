@@ -7,6 +7,8 @@
 Imports Microsoft.Win32
 Imports System.IO
 
+Imports SysPurge.API
+
 Public Class frmFS
 
    Dim grp As ListViewGroup = Nothing
