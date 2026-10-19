@@ -57,7 +57,7 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 <br>
 ![IDE](https://img.shields.io/badge/IDE-Visual%20Studio-purple?logo=visualstudio&logoColor=white)
 <br>
-![OS](https://img.shields.io/badge/OS-Windows-green)
+![OS](https://img.shields.io/badge/OS-Windows-green?logo=windows&logoColor=white)
 ![Runtime](https://img.shields.io/badge/Runtime-.NET%208.0-lightgreen)
 ![Runtime](https://img.shields.io/badge/Runtime-.NET%2010.0-lightgreen)
 <br>
