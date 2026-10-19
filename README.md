@@ -52,11 +52,14 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 ## Statistics
 
 ![VB.NET](https://img.shields.io/badge/Language-VB.NET-blue)
+<br>
 ![API](https://img.shields.io/badge/API-AdvAPI32-lightblue)
 ![API](https://img.shields.io/badge/API-User32-lightblue)
+<br>
 ![Runtime](https://img.shields.io/badge/Runtime-.NET%208.0-lightblue)
 ![Runtime](https://img.shields.io/badge/Runtime-.NET%2010.0-lightblue)
-![VS](https://img.shields.io/badge/IDE-Visual%20Studio-purple)
+<br>
+![IDE](https://img.shields.io/badge/IDE-Visual%20Studio-purple?logo=visualstudio)
 <br>
 ![status](https://img.shields.io/badge/status-in%20progress-orange) 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/SysPurge-VB.NET/total)
