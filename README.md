@@ -64,7 +64,6 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 ![status](https://img.shields.io/badge/status-in%20progress-orange) 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/SysPurge-VB.NET/total)
 
-![Language](https://img.shields.io/badge/Language-Rust-blue?logo=rust&logoColor=white)
 
 
 ## Roadmap
