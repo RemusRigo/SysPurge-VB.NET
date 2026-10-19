@@ -54,7 +54,6 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 ![VB.NET](https://img.shields.io/badge/Language-VB.NET-blue)
 ![API](https://img.shields.io/badge/API-AdvAPI32-lightblue)
 ![API](https://img.shields.io/badge/API-User32-lightblue)
-<br>
 ![IDE](https://img.shields.io/badge/IDE-Visual%20Studio-purple?logo=visualstudio&logoColor=white)
 <br>
 ![OS](https://img.shields.io/badge/OS-Windows-green?logo=windows&logoColor=white)
