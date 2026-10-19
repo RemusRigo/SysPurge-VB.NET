@@ -55,9 +55,9 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 ![API](https://img.shields.io/badge/API-AdvAPI32-lightblue)
 ![API](https://img.shields.io/badge/API-User32-lightblue)
 <br>
-![IDE](https://img.shields.io/badge/IDE-Visual%20Studio-purple?logo=visualstudio&logoColor=white)
+![IDE](https://img.shields.io/badge/IDE-Visual%20Studio-purple?style=for-the-badge&logo=visualstudio&logoColor=white)
 <br>
-![OS](https://img.shields.io/badge/OS-Windows-lightgreen?logo=windows)
+![OS](https://img.shields.io/badge/OS-Windows-lightgreen?style=for-the-badge&logo=windows&logoColor=white)
 ![Runtime](https://img.shields.io/badge/Runtime-.NET%208.0-lightblue)
 ![Runtime](https://img.shields.io/badge/Runtime-.NET%2010.0-lightblue)
 <br>
