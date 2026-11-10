@@ -71,7 +71,7 @@ Public Class frmApps
 
    '-----------------------------------------------------------------------------------------------
    ' Process Actions
-   Private Async Sub ProcessActions(itemsToProcess As List(Of ListViewItem))
+   Private Async Function ProcessActions(itemsToProcess As List(Of ListViewItem)) As Task
       For Each item As ListViewItem In itemsToProcess
          Dim grp = item.Group
          If grp Is Nothing Then Continue For
@@ -154,39 +154,38 @@ Public Class frmApps
 
             '--------------------------------------------------------------------------------------
             Case "Steam"
+
+               ' SteamPath uses forward slashes (e.g. "c:/program files (x86)/steam"); empty if Steam isn't installed
+               Dim steamPath As String = RegReadSZ(Registry.CurrentUser, "SOFTWARE\Valve\Steam", "SteamPath").Replace("/"c, "\"c)
+               Dim steamDefault As String = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Steam")
+
+               ' Builds the list of Steam folders to clean; skips SteamPath when it's missing,
+               ' so an empty value never turns into a relative path like "appcache"
+               Dim steamFolders = Function(subFolder As String) As List(Of String)
+                                     Dim list As New List(Of String) From {Path.Combine(steamDefault, subFolder)}
+                                     If steamPath <> "" Then list.Add(Path.Combine(steamPath, subFolder))
+                                     Return list
+                                  End Function
+
                Select Case item.Text
                   Case "appcache"
                      log.Msg.Info("Clean: Steam: Cache")
-                     Dim steamPath As String = RegReadSZ(Registry.CurrentUser, "SOFTWARE\Valve\Steam", "SteamPath")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Steam\appcache"),
-                        Path.Combine(steamPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar), "appcache"),
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Steam\htmlcache")
-                     }
+                     Dim pathsToClean = steamFolders("appcache")
+                     pathsToClean.Add(Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Steam\htmlcache"))
                      TaskCleanFolders(lvApps, item, pathsToClean, "*.*", True, True)
 
                   Case "Dumps"
                      log.Msg.Info("Clean: Steam: Dumps")
-                     Dim steamPath As String = RegReadSZ(Registry.CurrentUser, "SOFTWARE\Valve\Steam", "SteamPath")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Steam\Dumps"),
-                        Path.Combine(steamPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar), "Dumps")
-                     }
-                     TaskCleanFolders(lvApps, item, pathsToClean, "*.*", True, True)
+                     TaskCleanFolders(lvApps, item, steamFolders("Dumps"), "*.*", True, True)
 
                   Case "Traces"
                      log.Msg.Info("Clean: Steam: Traces")
-                     Dim steamPath As String = RegReadSZ(Registry.CurrentUser, "SOFTWARE\Valve\Steam", "SteamPath")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Steam\Traces"),
-                        Path.Combine(steamPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar), "Traces")
-                     }
-                     TaskCleanFolders(lvApps, item, pathsToClean, "*.*", True, True)
+                     TaskCleanFolders(lvApps, item, steamFolders("Traces"), "*.*", True, True)
                End Select
 
          End Select
       Next
-   End Sub
+   End Function
 
    '-----------------------------------------------------------------------------------------------
    ' frmSysPurge: onLoad
@@ -208,11 +207,15 @@ Public Class frmApps
          End If
       Next
 
+      btnAppsRun.Enabled = False
+
       Try
          'Pass the gathered items to the background worker
-         Await Task.Run(Sub() ProcessActions(itemsToProcess))
+         Await Task.Run(Function() ProcessActions(itemsToProcess))
+      Catch ex As Exception
+         log.Msg.Error($"Apps cleanup failed: {ex.Message}")
       Finally
-         'toolBtnPurge.Enabled = True
+         btnAppsRun.Enabled = True
       End Try
    End Sub
 

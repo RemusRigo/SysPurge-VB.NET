@@ -2,7 +2,7 @@
 ' user32.dll Functions for formanaging windows, handling input, and other core user interface tasks.
 '
 '   © 2026 Remus Rigo
-'      v1.0.20261006
+'      v1.0.20261110
 '--------------------------------------------------------------------------------------------------
 
 Imports System.Runtime.InteropServices
@@ -78,6 +78,14 @@ Namespace API
       End Function
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function CloseDesktop(hDesktop As IntPtr) As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function EnableWindow(hWnd As IntPtr, bEnable As Boolean) As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function EnumWindows(lpEnumFunc As EnumWindowsProc, lParam As IntPtr) As Boolean
       End Function
 
@@ -89,12 +97,16 @@ Namespace API
       Public Function FindWindowEx(hWndParent As IntPtr, hWndChildAfter As IntPtr, lpszClass As String, lpszWindow As String) As IntPtr
       End Function
 
-      <DllImport("user32.dll", CharSet:=CharSet.Unicode, SetLastError:=True)>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function GetClassName(hWnd As IntPtr, lpClassName As StringBuilder, nMaxCount As Integer) As Integer
       End Function
 
-      <DllImport("user32.dll")>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function GetClientRect(hWnd As IntPtr, ByRef lpRect As RECT) As <MarshalAs(UnmanagedType.Bool)> Boolean
+      End Function
+
+      <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function GetCurrentThreadId() As Integer
       End Function
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
@@ -110,10 +122,18 @@ Namespace API
       End Function
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function GetThreadDesktop(threadId As Integer) As IntPtr
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Unicode)>
+      Public Function GetUserObjectInformation(hObj As IntPtr, nIndex As Integer, pvInfo As StringBuilder, nLength As Integer, ByRef lpnLengthNeeded As Integer) As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function GetWindow(hWnd As IntPtr, uCmd As UInteger) As IntPtr
       End Function
 
-      <DllImport("user32.dll", SetLastError:=True)>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function GetWindowLong(hWnd As IntPtr, nIndex As Integer) As Integer
       End Function
 
@@ -125,20 +145,24 @@ Namespace API
       Public Function GetWindowText(hWnd As IntPtr, lpString As System.Text.StringBuilder, nMaxCount As Integer) As Integer
       End Function
 
-      <DllImport("user32.dll", SetLastError:=True)>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function GetWindowTextLength(hWnd As IntPtr) As Integer
       End Function
 
-      <DllImport("user32.dll", SetLastError:=True)>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function GetWindowThreadProcessId(hWnd As IntPtr, ByRef lpdwProcessId As UInteger) As UInteger
       End Function
 
-      <DllImport("user32.dll", SetLastError:=True)>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function IsWindow(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
       End Function
 
-      <DllImport("user32.dll")>
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function IsWindowVisible(hWnd As IntPtr) As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function OpenDesktop(name As String, flags As Integer, inherit As Boolean, access As UInteger) As IntPtr
       End Function
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
@@ -164,6 +188,14 @@ Namespace API
       End Function
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function SetProcessDPIAware() As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+      Public Function SetThreadDesktop(hDesktop As IntPtr) As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function SetWindowCompositionAttribute(hwnd As IntPtr, ByRef data As WindowCompositionAttributeData) As Integer
       End Function
 
@@ -173,6 +205,10 @@ Namespace API
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
       Public Function SetWindowPos(hWnd As IntPtr, hWndInsertAfter As IntPtr, X As Integer, Y As Integer, cx As Integer, cy As Integer, uFlags As UInteger) As Boolean
+      End Function
+
+      <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Unicode)>
+      Public Function SystemParametersInfo(uiAction As UInteger, uiParam As UInteger, pvParam As StringBuilder, fWinIni As UInteger) As Boolean
       End Function
 
       <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>

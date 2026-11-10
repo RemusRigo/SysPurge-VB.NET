@@ -1,9 +1,10 @@
 ﻿'--------------------------------------------------------------------------------------------------
 ' SysPurge: Tasks.vb
 '    © 2026 Remus Rigo
-'       v1.0.2026-07-24
+'       v1.0.20261110
 '--------------------------------------------------------------------------------------------------
 
+Imports System.Diagnostics.Eventing.Reader
 Imports System.IO
 Imports Microsoft.Win32
 
@@ -62,6 +63,38 @@ Module Tasks
    End Sub
 
    '-----------------------------------------------------------------------------------------------
+   ' SafeEnumerate: Collects files (matching mask) and subfolders under root, skipping folders
+   ' that can't be read and junctions/symlinks (avoids loops and escaping into other trees).
+   ' Folders are returned parent-before-child, so delete them in reverse order.
+   Private Sub SafeEnumerate(root As String, mask As String, recursive As Boolean, files As List(Of String), dirs As List(Of String))
+      Dim pending As New Stack(Of String)
+      pending.Push(root)
+
+      While pending.Count > 0
+         Dim dir As String = pending.Pop()
+
+         Try
+            files.AddRange(Directory.GetFiles(dir, mask))
+         Catch ex As UnauthorizedAccessException
+         Catch ex As IOException
+         End Try
+
+         If Not recursive Then Continue While
+
+         Try
+            For Each di As DirectoryInfo In New DirectoryInfo(dir).EnumerateDirectories()
+               If (di.Attributes And FileAttributes.ReparsePoint) = 0 Then
+                  dirs.Add(di.FullName)
+                  pending.Push(di.FullName)
+               End If
+            Next
+         Catch ex As UnauthorizedAccessException
+         Catch ex As IOException
+         End Try
+      End While
+   End Sub
+
+   '-----------------------------------------------------------------------------------------------
    ' Task: Clean Folders
    Public Sub TaskCleanFolders(lv As ListView, item As ListViewItem, folderPaths As IEnumerable(Of String), mask As String,
       recursive As Boolean, deleteFolders As Boolean, Optional includeParent As Boolean = False)
@@ -74,13 +107,10 @@ Module Tasks
       For Each folderPath As String In pathsList
          If Not Directory.Exists(folderPath) Then Continue For
 
-         Dim search = If(recursive, SearchOption.AllDirectories, SearchOption.TopDirectoryOnly)
-         Dim files() As String
-         Try
-            files = Directory.GetFiles(folderPath, mask, search)
-         Catch
-            Continue For
-         End Try
+         Dim fileList As New List(Of String)
+         Dim dirList As New List(Of String)
+         SafeEnumerate(folderPath, mask, recursive, fileList, dirList)
+         Dim files() As String = fileList.ToArray()
 
          For i = 0 To files.Length - 1
             Try
@@ -89,7 +119,7 @@ Module Tasks
                File.Delete(files(i))
                totalDeletedBytes += size
             Catch ex As Exception
-               log.Msg.Error("{ex.Message} : {files(i)}")
+               log.Msg.Error($"{ex.Message} : {files(i)}")
             End Try
 
             ' Update progress periodically
@@ -104,17 +134,13 @@ Module Tasks
 
          ' Cleanup folders if requested
          If deleteFolders AndAlso recursive Then
-            Try
-               Dim folders() As String = Directory.GetDirectories(folderPath, "*", SearchOption.AllDirectories)
-               For i = folders.Length - 1 To 0 Step -1
-                  Try
-                     Directory.Delete(folders(i), False)
-                  Catch ex As Exception
-                     log.Msg.Error($"{ex.Message} : {folders(i)}")
-                  End Try
-               Next
-            Catch
-            End Try
+            For i = dirList.Count - 1 To 0 Step -1
+               Try
+                  Directory.Delete(dirList(i), False)
+               Catch ex As Exception
+                  log.Msg.Error($"{ex.Message} : {dirList(i)}")
+               End Try
+            Next
          End If
 
          ' Delete the parent folder itself
@@ -136,6 +162,40 @@ Module Tasks
       Next
 
       SetTaskProgressBytes(lv, item, totalDeletedBytes, 100)
+   End Sub
+
+   '-----------------------------------------------------------------------------------------------
+   ' Task: Clear all Windows event logs (equivalent of "wevtutil cl" for every log). Requires elevation.
+   ' Logs that can't be cleared (e.g. enabled analytic/debug logs) are skipped.
+   Public Sub TaskClearEventLogs(lv As ListView, item As ListViewItem)
+      SetTaskProgressCount(lv, item, 0, 0)
+
+      Dim cleared As Integer = 0
+      Try
+         Using session As New EventLogSession()
+            Dim logNames As List(Of String) = session.GetLogNames().ToList()
+            Dim lastUpdate As Integer = Environment.TickCount
+
+            For i As Integer = 0 To logNames.Count - 1
+               Try
+                  session.ClearLog(logNames(i))
+                  cleared += 1
+               Catch
+                  ' not clearable / access denied: skip
+               End Try
+
+               Dim now = Environment.TickCount
+               If now - lastUpdate >= 40 Then
+                  SetTaskProgressCount(lv, item, cleared, CInt((i + 1) * 100.0 / logNames.Count))
+                  lastUpdate = now
+               End If
+            Next
+         End Using
+      Catch ex As Exception
+         log.Msg.Error($"Clear event logs: {ex.Message}")
+      End Try
+
+      SetTaskProgressCount(lv, item, cleared, 100)
    End Sub
 
    '-----------------------------------------------------------------------------------------------

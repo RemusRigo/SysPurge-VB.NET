@@ -1,12 +1,11 @@
 ﻿'--------------------------------------------------------------------------------------------------
 ' SysPurge: frmMSApps.vb - Clean Microsoft Apps
 '    © 2026 Remus Rigo
-'       v1.1.20260724
+'       v1.1.20261110
 '--------------------------------------------------------------------------------------------------
 
 Imports Microsoft.Win32
 Imports System.IO
-
 Imports SysPurge.API
 
 Public Class frmMSApps
@@ -44,7 +43,7 @@ Public Class frmMSApps
       LV_AddItem("Telemetry data", True)
 
       LV_AddGroup("EventViewer")
-      LV_AddItem("Logs", True)
+      If IsAppElevated() Then LV_AddItem("Logs", True)
 
       LV_AddGroup("DirectX")
       LV_AddItem("Shader Cache", True)
@@ -81,7 +80,7 @@ Public Class frmMSApps
 
    '-----------------------------------------------------------------------------------------------
    ' Process Actions
-   Private Async Sub ProcessActions(itemsToProcess As List(Of ListViewItem))
+   Private Sub ProcessActions(itemsToProcess As List(Of ListViewItem))
       For Each item As ListViewItem In itemsToProcess
          Dim grp = item.Group
          If grp Is Nothing Then Continue For
@@ -118,15 +117,11 @@ Public Class frmMSApps
             Case "EventViewer"
                Select Case item.Text
 
-                  Case "logs"
-                     log.Msg.Info("Clean: Microsoft EventViewer: logs")
-                     StopService("eventlog")
-                     Await Task.Delay(5000)
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("SystemRoot"), "System32\winevt\Logs")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.evtx", False, False)
-                     StartService("eventlog")
+                  Case "Logs"
+                     log.Msg.Info("Clean: Microsoft EventViewer: Logs")
+                     ' The EventLog service can't be stopped (the .evtx files stay locked),
+                     ' so clear each log through the Event Log API instead (same as "wevtutil cl").
+                     TaskClearEventLogs(lvMSApps, item)
                End Select
 
             '--------------------------------------------------------------------------------------
@@ -165,8 +160,10 @@ Public Class frmMSApps
 
                   Case "Typed URLs"
                      log.Msg.Info("Clean: Microsoft Internet Explorer: Typed URLs")
+                     ' TypedURLsTime only holds timestamps for the TypedURLs entries: clear it silently,
+                     ' so the row shows the TypedURLs count (a second TaskCleanRegValues would overwrite it)
+                     RegDeleteAllValues(Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLsTime", False)
                      TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLs", False)
-                     TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLsTime", False)
 
                End Select
 
@@ -184,22 +181,28 @@ Public Class frmMSApps
                   Case "Temp folder"
                      log.Msg.Info("Clean: Microsoft OneDrive: Temp folder")
 
-                     Dim oneDriveTmpPath As String = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive"), "OneDriveTemp")
+                     Dim oneDriveTmpPath As String = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive") & "\", "OneDriveTemp")
 
-                     If IsProcessRunning("OneDrive") Then
-                        KillProcessByName("OneDrive")
-                     End If
-                     If IsProcessRunning("FileCoAuth") Then
-                        KillProcessByName("FileCoAuth")
+                     If Not Directory.Exists(oneDriveTmpPath) Then
+                        SetTaskProgressBytes(lvMSApps, item, 0, 100)
+                        Exit Select
                      End If
 
-                     TakeOwnership(oneDriveTmpPath)
-                     GrantFullControl(oneDriveTmpPath)
+                     Try
+                        If IsProcessRunning("OneDrive") Then KillProcessByName("OneDrive")
+                        If IsProcessRunning("FileCoAuth") Then KillProcessByName("FileCoAuth")
 
-                     Dim pathsToClean As String() = {
-                        oneDriveTmpPath
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True, True)
+                        TakeOwnership(oneDriveTmpPath)
+                        GrantFullControl(oneDriveTmpPath)
+
+                        Dim pathsToClean As String() = {
+                           oneDriveTmpPath
+                        }
+                        TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True, True)
+                     Catch ex As Exception
+                        log.Msg.Warning($"OneDrive Temp folder: {ex.Message}")
+                        'SetTaskProgressBytes(lvMSApps, item, 0, 100)
+                     End Try
                End Select
 
             '--------------------------------------------------------------------------------------
@@ -273,12 +276,14 @@ Public Class frmMSApps
             itemsToProcess.Add(item)
          End If
       Next
-
+      btnMSAppsRun.Enabled = False
       Try
          'Pass the gathered items to the background worker
          Await Task.Run(Sub() ProcessActions(itemsToProcess))
+      Catch ex As Exception
+         log.Msg.Error($"MSApps cleanup failed: {ex.Message}")
       Finally
-         'toolBtnPurge.Enabled = True
+         btnMSAppsRun.Enabled = True
       End Try
    End Sub
 

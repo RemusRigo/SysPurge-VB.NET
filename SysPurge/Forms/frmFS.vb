@@ -1,12 +1,11 @@
 ﻿'--------------------------------------------------------------------------------------------------
 ' SysPurge: frmFS.vb - Clean File System
 '    © 2026 Remus Rigo
-'       v1.1.20260828
+'       v1.1.20261110
 '--------------------------------------------------------------------------------------------------
 
 Imports Microsoft.Win32
 Imports System.IO
-
 Imports SysPurge.API
 
 Public Class frmFS
@@ -43,8 +42,7 @@ Public Class frmFS
       LV_AddGroup("Temporary/Junk files")
       LV_AddItem("User Temp folder", True)
       LV_AddItem("System Temp folder", True)
-      LV_AddItem("Log files (inside Windows)", True)
-      LV_AddItem("Log files (System drive)", False)
+      LV_AddItem("Log files", True)
       If IsAppElevated() Then LV_AddItem("Previous Windows installation", True)
 
       LV_AddGroup("Microsoft Windows FileSystem")
@@ -84,30 +82,37 @@ Public Class frmFS
                      }
                      TaskCleanFolders(lvFS, item, pathsToClean, "*.*", True, True)
 
-                  Case "Log files (inside Windows)"
-                     log.Msg.Info("Clean: Temporary/Junk files: Log files (inside Windows)")
-                     Dim pathsToClean As String() = {
-                        Environment.GetEnvironmentVariable("SystemRoot")
+                  Case "Log files"
+                     log.Msg.Info("Clean: Temporary/Junk files: Log files")
+                     Dim winDir As String = Environment.GetEnvironmentVariable("SystemRoot")
+                     Dim pathsToClean As String() = {winDir}
+                     TaskCleanFolders(lvFS, item, pathsToClean, "*.log", False, False)
+                     pathsToClean = {
+                        winDir & "\Debug",
+                        winDir & "\Logs",
+                        winDir & "\Panther",
+                        winDir & "\System32\LogFiles"
                      }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.log", True, True)
-
-                  Case "Log files (System drive)"
-                     log.Msg.Info("Clean: Temporary/Junk files: Log files (System drive)")
-                     Dim pathsToClean As String() = {
-                        Environment.GetEnvironmentVariable("SystemDrive")
-                     }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.log", True, True)
+                     TaskCleanFolders(lvFS, item, pathsToClean, "*.log", True, False)
 
                   Case "Previous Windows installation"
                      log.Msg.Info("Clean: Temporary/Junk files: Previous Windows installation")
-                     Dim prevWinDir As String = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive"), "Windows.old")
+                     Dim prevWinDir As String = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive") & "\", "Windows.old")
+
+                     If Not Directory.Exists(prevWinDir) Then
+                        SetTaskProgressBytes(lvFS, item, 0, 100)
+                        Exit Select
+                     End If
+
                      Try
-                        TakeOwnership(prevWinDir)
-                        GrantFullControl(prevWinDir)
+                        Dim failed As Integer = PrepareTreeForDeletion(prevWinDir, Sub(p, ex) log.Msg.Warning($"{ex.Message} : {p}"))
+                        If failed > 0 Then log.Msg.Warning($"Windows.old: {failed} item(s) could not be prepared for deletion")
+
                         Dim pathsToClean As String() = {prevWinDir}
                         TaskCleanFolders(lvFS, item, pathsToClean, "*.*", True, True, True)
                      Catch ex As Exception
-                        log.Msg.Warning(ex.Message)
+                        log.Msg.Warning($"{ex.Message} : {prevWinDir}")
+                        SetTaskProgressBytes(lvFS, item, 0, 100)
                      End Try
                End Select
 
@@ -117,11 +122,10 @@ Public Class frmFS
 
                   Case "Jump List"
                      log.Msg.Info("Clean: Microsoft Windows FileSystem: Jump List")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent\AutomaticDestinations"),
-                        Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent\CustomDestinations")
-                     }
-                     TaskCleanFolders(lvFS, item, pathsToClean, "*.automaticDestinations-ms", False, False)
+                     Dim pathsToCleanAD As String() = {Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent\AutomaticDestinations")}
+                     Dim pathsToCleanCD As String() = {Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent\CustomDestinations")}
+                     TaskCleanFolders(lvFS, item, pathsToCleanAD, "*.automaticDestinations-ms", False, False)
+                     TaskCleanFolders(lvFS, item, pathsToCleanCD, "*.customDestinations-ms", False, False)
 
                   Case "Prefetch files"
                      log.Msg.Info("Clean: Microsoft Windows FileSystem: Prefetch files")
@@ -130,7 +134,7 @@ Public Class frmFS
                      }
                      TaskCleanFolders(lvFS, item, pathsToClean, "*.pf", False, False)
 
-                  Case "Recent files"
+                  Case "Recent Items"
                      log.Msg.Info("Clean: Microsoft Windows FileSystem: Recent Items")
                      Dim pathsToClean As String() = {
                         Path.Combine(Environment.GetEnvironmentVariable("appdata"), "Microsoft\Windows\Recent"),
@@ -172,16 +176,21 @@ Public Class frmFS
 
    '-----------------------------------------------------------------------------------------------
    ' tsFS_btnRun: onClick
-   Private Sub tsFS_btnRun_Click(sender As Object, e As EventArgs) Handles tsFS_btnRun.Click
+   Private Async Sub tsFS_btnRun_Click(sender As Object, e As EventArgs) Handles tsFS_btnRun.Click
+      ' Gather the items to process on the UI thread
+      Dim itemsToProcess As New List(Of ListViewItem)()
+      For Each item As ListViewItem In lvFS.Items
+         If item.Checked AndAlso item.Group IsNot Nothing Then
+            itemsToProcess.Add(item)
+         End If
+      Next
+
       tsFS_btnRun.Enabled = False
       Try
-         Dim itemsToProcess As New List(Of ListViewItem)()
-         For Each item As ListViewItem In lvFS.Items
-            If item.Checked AndAlso item.Group IsNot Nothing Then
-               itemsToProcess.Add(item)
-            End If
-         Next
-         ProcessActions(itemsToProcess)
+         ' Run the cleanup on a background thread so the UI stays responsive
+         Await Task.Run(Sub() ProcessActions(itemsToProcess))
+      Catch ex As Exception
+         log.Msg.Error($"FileSystem cleanup failed: {ex.Message}")
       Finally
          tsFS_btnRun.Enabled = True
       End Try

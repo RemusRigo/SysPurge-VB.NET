@@ -45,7 +45,7 @@ SysPurge: a Windows cleaning tool
 
 ## User's Guide
 
-See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and usage.
+See the [User's Guide](Users%20Guide.md) for downloads, runtimes, installation and usage.
 
 
 
@@ -54,11 +54,9 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 ![VB.NET](https://img.shields.io/badge/Language-VB.NET-blue)
 ![API](https://img.shields.io/badge/API-AdvAPI32-lightblue)
 ![API](https://img.shields.io/badge/API-User32-lightblue)
-![IDE](https://img.shields.io/badge/IDE-Visual%20Studio-purple?logo=visualstudio&logoColor=white)
-<br>
-![OS](https://img.shields.io/badge/OS-Windows-green?logo=windows&logoColor=white)
-![Runtime](https://img.shields.io/badge/Runtime-.NET%208.0-lightgreen)
-![Runtime](https://img.shields.io/badge/Runtime-.NET%2010.0-lightgreen)
+![Runtime](https://img.shields.io/badge/Runtime-.NET%208.0-lightblue)
+![Runtime](https://img.shields.io/badge/Runtime-.NET%2010.0-lightblue)
+![VS](https://img.shields.io/badge/IDE-Visual%20Studio-purple)
 <br>
 ![status](https://img.shields.io/badge/status-in%20progress-orange) 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/SysPurge-VB.NET/total)
@@ -97,5 +95,6 @@ See the [User's Guide](UsersGuide.md) for downloads, runtimes, installation and 
 
 ## History/Versions
 
+* 2011-11-11: SysCleaner written in VB.NET
 * 2010-06-04: SysCleaner written in Delphi
 * 2008-02-21: SysSweeper written in Delphi

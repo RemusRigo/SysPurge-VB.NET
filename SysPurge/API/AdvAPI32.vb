@@ -9,6 +9,7 @@ Imports System.Runtime.InteropServices
 Module AdvAPI32
 
    Public Const OWNER_SECURITY_INFORMATION As UInteger = &H1UI
+   Public Const DACL_SECURITY_INFORMATION As UInteger = &H4UI
    Friend Const POLICY_ALL_ACCESS As UInteger = &HF0FFF
    Public Const SE_FILE_OBJECT As Integer = 1
    Public Const SE_PRIVILEGE_ENABLED As UInteger = &H2UI
@@ -69,29 +70,12 @@ Module AdvAPI32
    End Structure
 
    <DllImport("advapi32.dll", SetLastError:=True)>
-   Public Function AdjustTokenPrivileges(tokenHandle As IntPtr,
-      disableAllPrivileges As Boolean,
-      ByRef newState As TOKEN_PRIVILEGES,
-      bufferLength As Integer,
-      ByRef previousState As TOKEN_PRIVILEGES,
-      ByRef returnLength As Integer) As Boolean
+   Public Function AdjustTokenPrivileges(tokenHandle As IntPtr, disableAllPrivileges As Boolean, ByRef newState As TOKEN_PRIVILEGES, bufferLength As Integer,
+      ByRef previousState As TOKEN_PRIVILEGES, ByRef returnLength As Integer) As Boolean
    End Function
 
    <DllImport("advapi32.dll", SetLastError:=True)>
    Public Function LookupPrivilegeValue(lpSystemName As String, lpName As String, ByRef lpLuid As LUID) As Boolean
-   End Function
-
-   <DllImport("advapi32.dll", SetLastError:=True)>
-   Friend Function LsaOpenPolicy(ByRef SystemName As LSA_UNICODE_STRING, ByRef ObjectAttributes As LSA_OBJECT_ATTRIBUTES, AccessMask As UInteger,
-                                 ByRef PolicyHandle As IntPtr) As UInteger
-   End Function
-
-   <DllImport("advapi32.dll", SetLastError:=True)>
-   Friend Function LsaStorePrivateData(PolicyHandle As IntPtr, ByRef KeyName As LSA_UNICODE_STRING, ByRef PrivateData As LSA_UNICODE_STRING) As UInteger
-   End Function
-
-   <DllImport("advapi32.dll", SetLastError:=True)>
-   Friend Function LsaRetrievePrivateData(PolicyHandle As IntPtr, ByRef KeyName As LSA_UNICODE_STRING, ByRef PrivateData As IntPtr) As UInteger
    End Function
 
    <DllImport("advapi32.dll")>
@@ -103,18 +87,30 @@ Module AdvAPI32
    End Function
 
    <DllImport("advapi32.dll", SetLastError:=True)>
-   Public Function OpenProcessToken(hProcess As IntPtr, desiredAccess As UInteger, ByRef tokenHandle As IntPtr) As Boolean
+   Friend Function LsaOpenPolicy(ByRef SystemName As LSA_UNICODE_STRING, ByRef ObjectAttributes As LSA_OBJECT_ATTRIBUTES, AccessMask As UInteger,
+                                 ByRef PolicyHandle As IntPtr) As UInteger
    End Function
 
    <DllImport("advapi32.dll", SetLastError:=True)>
-   Public Function SetNamedSecurityInfo(
-      pObjectName As String,
-      objectType As SE_OBJECT_TYPE,
-      securityInfo As UInteger,
-      owner As IntPtr,
-      group As IntPtr,
-      dacl As IntPtr,
-      sacl As IntPtr) As UInteger
+   Friend Function LsaRetrievePrivateData(PolicyHandle As IntPtr, ByRef KeyName As LSA_UNICODE_STRING, ByRef PrivateData As IntPtr) As UInteger
+   End Function
+
+   <DllImport("advapi32.dll", SetLastError:=True)>
+   Friend Function LsaStorePrivateData(PolicyHandle As IntPtr, ByRef KeyName As LSA_UNICODE_STRING, ByRef PrivateData As LSA_UNICODE_STRING) As UInteger
+   End Function
+
+   <DllImport("advapi32.dll", SetLastError:=True)>
+   Public Function OpenProcessToken(hProcess As IntPtr, desiredAccess As UInteger, ByRef tokenHandle As IntPtr) As Boolean
+   End Function
+
+   ' Sets security on an open handle. Unlike SetNamedSecurityInfo it does NOT propagate inheritable ACEs to child objects, so it is fast when applied item by item.
+   <DllImport("advapi32.dll", SetLastError:=True)>
+   Friend Function SetKernelObjectSecurity(handle As SafeHandle, securityInformation As UInteger, securityDescriptor As Byte()) As Boolean
+   End Function
+
+   <DllImport("advapi32.dll", SetLastError:=True)>
+   Public Function SetNamedSecurityInfo(pObjectName As String, objectType As SE_OBJECT_TYPE, securityInfo As UInteger, owner As IntPtr,
+      group As IntPtr, dacl As IntPtr, sacl As IntPtr) As UInteger
    End Function
 
 End Module

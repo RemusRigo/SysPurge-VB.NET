@@ -43,7 +43,8 @@ Public Class frmReg
       LV_AddItem("Run MRU", True)
 
       LV_AddGroup("Misc")
-      If IsAppElevated() Then LV_AddItem("Shared DLL's)", True)
+      ' TODO: not implemented yet - unchecked so it doesn't look like it ran
+      If IsAppElevated() Then LV_AddItem("Shared DLLs", False)
 
       ResizeListViewColumns(lvReg)
       lvReg.EndUpdate()
@@ -72,7 +73,7 @@ Public Class frmReg
             Case "Misc"
                Select Case item.Text
 
-                  Case "Shared DLL's)"
+                  Case "Shared DLLs"
                      'log.Msg.Info("Clean: Microsoft Windows » FileSystem: Jump List")
                      '
                End Select
@@ -101,11 +102,15 @@ Public Class frmReg
          End If
       Next
 
+      btnRegRun.Enabled = False
+
       Try
          'Pass the gathered items to the background worker
          Await Task.Run(Sub() ProcessActions(itemsToProcess))
+      Catch ex As Exception
+         log.Msg.Error($"Registry cleanup failed: {ex.Message}")
       Finally
-         'toolBtnPurge.Enabled = True
+         btnRegRun.Enabled = True
       End Try
    End Sub
 
