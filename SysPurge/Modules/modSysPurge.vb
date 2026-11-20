@@ -1,3 +1,0 @@
-﻿Module modSysPurge
-
-End Module

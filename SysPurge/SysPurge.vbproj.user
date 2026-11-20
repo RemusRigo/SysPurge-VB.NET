@@ -4,6 +4,9 @@
     <ActiveDebugFramework>net10.0-windows</ActiveDebugFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Update="Classes\BufferedListView.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="Forms\frmReg.vb">
       <SubType>Form</SubType>
     </Compile>

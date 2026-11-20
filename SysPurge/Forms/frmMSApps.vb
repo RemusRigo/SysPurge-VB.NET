@@ -1,361 +1,160 @@
 ﻿'--------------------------------------------------------------------------------------------------
 ' SysPurge: frmMSApps.vb - Clean Microsoft Apps
 '    © 2026 Remus Rigo
-'       v1.1.20261110
+'       v1.2.20261120
 '--------------------------------------------------------------------------------------------------
 
-Imports Microsoft.Win32
 Imports System.IO
-Imports SysPurge.API
+Imports Microsoft.Win32
 
 Public Class frmMSApps
 
-   Dim grp As ListViewGroup = Nothing
    Dim log As New Logger(appName)
-
-   '-----------------------------------------------------------------------------------------------
-   ' Add ListView Group
-   Private Sub LV_AddGroup(name As String)
-      grp = New ListViewGroup(name)
-      lvMSApps.Groups.Add(grp)
-   End Sub
-
-   '-----------------------------------------------------------------------------------------------
-   ' Add ListView item
-   Private Sub LV_AddItem(name As String, isChecked As Boolean)
-      Dim item As New ListViewItem(name)
-      item.SubItems.Add("")
-      item.SubItems.Add("")
-      item.Checked = isChecked
-      item.Tag = 0
-      item.Group = grp
-      lvMSApps.Items.Add(item)
-   End Sub
+   Dim cl As CleanerList
 
    '-----------------------------------------------------------------------------------------------
    ' Build Options
    Public Sub BuildOptions()
-      lvMSApps.BeginUpdate()
-      lvMSApps.Items.Clear()
-      lvMSApps.Groups.Clear()
+      Dim appData As String = Environment.GetEnvironmentVariable("AppData")
+      Dim localAppData As String = Environment.GetEnvironmentVariable("LocalAppData")
+      Dim userProfile As String = Environment.GetEnvironmentVariable("UserProfile")
+      Dim shellFolders As String = "Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders"
 
-      LV_AddGroup(".NET")
-      LV_AddItem("Telemetry data", True)
+      cl.Build(
+         Sub()
+            '-------------------------------------------------------------
+            cl.AddGroup(".NET")
 
-      LV_AddGroup("EventViewer")
-      If IsAppElevated() Then LV_AddItem("Logs", True)
+            ' Telemetry data
+            cl.AddItem("Telemetry data", True,
+               New CleanTarget(Path.Combine(userProfile, ".dotnet\TelemetryStorageService"), "*.*", False, False))
 
-      LV_AddGroup("DirectX")
-      LV_AddItem("Shader Cache", True)
-      LV_AddItem("Direct3D: Most Recent Application", True)
+            '-------------------------------------------------------------
+            cl.AddGroup("EventViewer")
 
-      LV_AddGroup("Internet Explorer")
-      LV_AddItem("Cache", True)
-      LV_AddItem("Cookies", True)
-      LV_AddItem("Temporary Internet Files", True)
-      LV_AddItem("Typed URLs", True)
+            ' Logs
+            ' The EventLog service can't be stopped (the .evtx files stay locked), so clear each log through the Event Log API instead (same as "wevtutil cl").
+            If IsAppElevated() Then
+               cl.AddCustomItem("Logs", True, AddressOf TaskClearEventLogs, AddressOf CleanerList.GetEventLogsSize)
+            End If
 
-      LV_AddGroup("Microsoft Management Console")
-      LV_AddItem("Recent File List", True)
+            '-------------------------------------------------------------
+            cl.AddGroup("DirectX")
 
-      LV_AddGroup("OneDrive")
-      If IsAppElevated() Then LV_AddItem("Temp folder", True)
+            ' Shader Cache
+            cl.AddItem("Shader Cache", True,
+               New CleanTarget(Path.Combine(localAppData, "Microsoft\DirectX Shader Cache"), "*.*", False, False))
+            cl.AddRegItem("Direct3D: Most Recent Application", True, Registry.CurrentUser, "Software\Microsoft\Direct3D\MostRecentApplication")
 
-      LV_AddGroup("PowerShell")
-      LV_AddItem("Console Host History", True)
+            '-------------------------------------------------------------
+            cl.AddGroup("Internet Explorer")
 
-      LV_AddGroup("Teams")
-      LV_AddItem("Cache", True)
+            ' Cache
+            cl.AddItem("Cache", True,
+               New CleanTarget(Path.Combine(localAppData, "Microsoft\Windows\INetCache\IE")),
+               New CleanTarget(Path.Combine(localAppData, "Microsoft\Windows\WebCache")))
 
-      LV_AddGroup("Visual Studio")
-      LV_AddItem("Telemetry data", True)
+            ' Cookies
+            cl.AddItem("Cookies", True,
+               New CleanTarget(Path.Combine(localAppData, "Microsoft\Windows\INetCookies")),
+               New CleanTarget(RegReadSZ(Registry.CurrentUser, shellFolders, "Cookies")))
 
-      LV_AddGroup("Windows Media Player")
-      LV_AddItem("Recent File List", True)
-      LV_AddItem("Recent URLs List", True)
+            ' Temporary Internet Files
+            cl.AddItem("Temporary Internet Files", True,
+               New CleanTarget(Path.Combine(localAppData, "Microsoft\Windows\INetCache")),
+               New CleanTarget(Path.Combine(localAppData, "Microsoft\Windows\Temporary Internet Files")),
+               New CleanTarget(Path.Combine(localAppData, "Temporary Internet Files")),
+               New CleanTarget(Path.Combine(userProfile, "Local Settings\Temporary Internet Files")),
+               New CleanTarget(RegReadSZ(Registry.CurrentUser, shellFolders, "Cache")))
 
-      ResizeListViewColumns(lvMSApps)
-      lvMSApps.EndUpdate()
+            ' Typed URLs
+            With cl.AddRegItem("Typed URLs", True, Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLs")
+               ' TypedURLsTime only holds timestamps for the TypedURLs entries: clear it silently, so the row shows the TypedURLs count
+               .BeforeClean = Sub() RegDeleteAllValues(Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLsTime", False)
+            End With
+
+            '-------------------------------------------------------------
+            cl.AddGroup("Microsoft Management Console")
+
+            ' Recent File List
+            cl.AddRegItem("Recent File List", True, Registry.CurrentUser, "Software\Microsoft\Microsoft Management Console\Recent File List")
+
+            '-------------------------------------------------------------
+            cl.AddGroup("OneDrive")
+
+            ' Temp folder
+            If IsAppElevated() Then
+               Dim oneDriveTmpPath As String = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive") & "\", "OneDriveTemp")
+               With cl.AddItem("Temp folder", True, New CleanTarget(oneDriveTmpPath, includeParent:=True))
+                  .BeforeClean = Sub()
+                                    If Not Directory.Exists(oneDriveTmpPath) Then Return
+                                    If IsProcessRunning("OneDrive") Then KillProcessByName("OneDrive")
+                                    If IsProcessRunning("FileCoAuth") Then KillProcessByName("FileCoAuth")
+                                    TakeOwnership(oneDriveTmpPath)
+                                    GrantFullControl(oneDriveTmpPath)
+                                 End Sub
+               End With
+            End If
+
+            '--------------------------------------------------------------
+            cl.AddGroup("PowerShell")
+
+            ' Console Host History
+            ' ConsoleHost_history.txt | history_YYYYMMDD.json
+            cl.AddItem("Console Host History", True,
+               New CleanTarget(Path.Combine(appData, "Microsoft\Windows\PowerShell\PSReadLine"), "*.*", False, False),
+               New CleanTarget(Path.Combine(appData, "Microsoft\PowerShell\PSReadLine"), "*.*", False, False))
+
+            '--------------------------------------------------------------
+            cl.AddGroup("Teams")
+
+            ' Cache
+            cl.AddItem("Cache", True,
+               New CleanTarget(Path.Combine(appData, "Microsoft\Teams")),
+               New CleanTarget(Path.Combine(localAppData, "Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams")))
+
+            '--------------------------------------------------------------
+            cl.AddGroup("Visual Studio")
+
+            ' Telemetry data
+            cl.AddItem("Telemetry data", True,
+               New CleanTarget(Path.Combine(appData, "vstelemetry"), "*.*", False, False),
+               New CleanTarget(Path.Combine(localAppData, "Temp\VSTelem"), "*.*", False, False),
+               New CleanTarget(Path.Combine(Environment.GetEnvironmentVariable("ProgramData"), "vstelemetry"), "*.*", False, False))
+
+            '--------------------------------------------------------------
+            cl.AddGroup("Windows Media Player")
+
+            ' Recent File List
+            cl.AddRegItem("Recent File List", True, Registry.CurrentUser, "Software\Microsoft\MediaPlayer\Player\RecentFileList")
+
+            ' Recent URLs List
+            cl.AddRegItem("Recent URLs List", True, Registry.CurrentUser, "Software\Microsoft\MediaPlayer\Player\RecentURLList")
+         End Sub)
    End Sub
 
    '-----------------------------------------------------------------------------------------------
-   ' Process Actions
-   Private Sub ProcessActions(itemsToProcess As List(Of ListViewItem))
-      For Each item As ListViewItem In itemsToProcess
-         Dim grp = item.Group
-         If grp Is Nothing Then Continue For
-
-         Select Case grp.Header
-
-            '--------------------------------------------------------------------------------------
-            Case ".NET"
-               Select Case item.Text
-                  Case "Telemetry data"
-                     log.Msg.Info("Clean: Microsoft .NET: Telemetry data")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("UserProfile"), ".dotnet\TelemetryStorageService")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", False, False)
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "DirectX"
-               Select Case item.Text
-                  Case "Shader Cache"
-                     log.Msg.Info("Clean: Microsoft DirectX: Shader Cache")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Microsoft\DirectX Shader Cache")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", False, False)
-
-                  Case "Direct3D: Most Recent Application"
-                     log.Msg.Info("Clean: Microsoft DirectX: Direct3D:Most Recent Application")
-                     TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\Direct3D\MostRecentApplication", False)
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "EventViewer"
-               Select Case item.Text
-
-                  Case "Logs"
-                     log.Msg.Info("Clean: Microsoft EventViewer: Logs")
-                     ' The EventLog service can't be stopped (the .evtx files stay locked),
-                     ' so clear each log through the Event Log API instead (same as "wevtutil cl").
-                     TaskClearEventLogs(lvMSApps, item)
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "Internet Explorer"
-               Select Case item.Text
-
-                  Case "Cache"
-                     log.Msg.Info("Clean: Microsoft Internet Explorer: Cache")
-
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Microsoft\Windows\INetCache\IE"),
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Microsoft\Windows\WebCache")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True)
-
-                  Case "Cookies"
-                     log.Msg.Info("Clean: Microsoft Internet Explorer: Cookies")
-
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Microsoft\Windows\INetCookies"),
-                        RegReadSZ(Registry.CurrentUser, "Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders", "Cookies")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True)
-
-                  Case "Temporary Internet Files"
-                     log.Msg.Info("Clean: Microsoft Internet Explorer: Temporary Internet Files")
-
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Microsoft\Windows\INetCache"),
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Microsoft\Windows\Temporary Internet Files"),
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Temporary Internet Files"),
-                        Path.Combine(Environment.GetEnvironmentVariable("UserProfile"), "Local Settings\Temporary Internet Files"),
-                        RegReadSZ(Registry.CurrentUser, "Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders", "Cache")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True)
-
-                  Case "Typed URLs"
-                     log.Msg.Info("Clean: Microsoft Internet Explorer: Typed URLs")
-                     ' TypedURLsTime only holds timestamps for the TypedURLs entries: clear it silently,
-                     ' so the row shows the TypedURLs count (a second TaskCleanRegValues would overwrite it)
-                     RegDeleteAllValues(Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLsTime", False)
-                     TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\Internet Explorer\TypedURLs", False)
-
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "Microsoft Management Console"
-               Select Case item.Text
-                  Case "Recent File List"
-                     log.Msg.Info("Clean: Microsoft Management Console: Recent File List")
-                     TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\Microsoft Management Console\Recent File List", False)
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "OneDrive"
-               Select Case item.Text
-                  Case "Temp folder"
-                     log.Msg.Info("Clean: Microsoft OneDrive: Temp folder")
-
-                     Dim oneDriveTmpPath As String = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive") & "\", "OneDriveTemp")
-
-                     If Not Directory.Exists(oneDriveTmpPath) Then
-                        SetTaskProgressBytes(lvMSApps, item, 0, 100)
-                        Exit Select
-                     End If
-
-                     Try
-                        If IsProcessRunning("OneDrive") Then KillProcessByName("OneDrive")
-                        If IsProcessRunning("FileCoAuth") Then KillProcessByName("FileCoAuth")
-
-                        TakeOwnership(oneDriveTmpPath)
-                        GrantFullControl(oneDriveTmpPath)
-
-                        Dim pathsToClean As String() = {
-                           oneDriveTmpPath
-                        }
-                        TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True, True)
-                     Catch ex As Exception
-                        log.Msg.Warning($"OneDrive Temp folder: {ex.Message}")
-                        'SetTaskProgressBytes(lvMSApps, item, 0, 100)
-                     End Try
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "PowerShell"
-               Select Case item.Text
-                  Case "Console Host History" ' ConsoleHost_history.txt | history_YYYYMMDD.json
-                     log.Msg.Info("Clean: Microsoft PowerShell: Console Host History")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("AppData"), "Microsoft\Windows\PowerShell\PSReadLine"),
-                        Path.Combine(Environment.GetEnvironmentVariable("AppData"), "Microsoft\PowerShell\PSReadLine")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", False, False)
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "Teams"
-               Select Case item.Text
-                  Case "Cache"
-                     log.Msg.Info("Clean: Microsoft Teams: Cache")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("AppData"), "Microsoft\Teams"),
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", True, True)
-               End Select
-
-            '--------------------------------------------------------------------------------------
-            Case "Visual Studio"
-               Select Case item.Text
-                  Case "Telemetry data"
-                     log.Msg.Info("Clean: Microsoft Visual Studio: Telemetry data")
-                     Dim pathsToClean As String() = {
-                        Path.Combine(Environment.GetEnvironmentVariable("AppData"), "vstelemetry"),
-                        Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Temp\VSTelem"),
-                        Path.Combine(Environment.GetEnvironmentVariable("ProgramData"), "vstelemetry")
-                     }
-                     TaskCleanFolders(lvMSApps, item, pathsToClean, "*.*", False, False)
-               End Select
-
-          '--------------------------------------------------------------------------------------
-            Case "Windows Media Player"
-               Select Case item.Text
-                  Case "Recent File List"
-                     log.Msg.Info("Clean: Microsoft Windows Media Player: Recent File List")
-                     TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\MediaPlayer\Player\RecentFileList", False)
-               End Select
-
-               Select Case item.Text
-                  Case "Recent URLs List"
-                     log.Msg.Info("Clean: Microsoft Windows Media Player: Recent URLs List")
-                     TaskCleanRegValues(lvMSApps, item, Registry.CurrentUser, "Software\Microsoft\MediaPlayer\Player\RecentURLList", False)
-               End Select
-         End Select
-      Next
-   End Sub
-
-   '-----------------------------------------------------------------------------------------------
-   ' frmSysPurge: onLoad
-   Private Sub frmSysPurge_Load(sender As Object, e As EventArgs) Handles Me.Load
-      SendMessage(lvMSApps.Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, CType(LVS_EX_DOUBLEBUFFER, IntPtr), CType(LVS_EX_DOUBLEBUFFER, IntPtr))
+   ' frmMSApps: onLoad
+   Private Sub frmMSApps_Load(sender As Object, e As EventArgs) Handles Me.Load
+      cl = New CleanerList(lvMSApps, log)
       BuildOptions()
    End Sub
 
    '-----------------------------------------------------------------------------------------------
-   ' btnTSPurge: onClick
-   Private Async Sub btnTSPurge_Click(sender As Object, e As EventArgs) Handles btnMSAppsRun.Click
-      ' 1. Gather the items to process on the UI thread
-      Dim itemsToProcess As New List(Of ListViewItem)()
-      For Each item As ListViewItem In lvMSApps.Items
-         If item.Checked AndAlso item.Group IsNot Nothing Then
-            itemsToProcess.Add(item)
-         End If
-      Next
+   ' btnMSAppsRun: onClick
+   Private Async Sub btnMSAppsRun_Click(sender As Object, e As EventArgs) Handles btnMSAppsRun.Click
       btnMSAppsRun.Enabled = False
       Try
-         'Pass the gathered items to the background worker
-         Await Task.Run(Sub() ProcessActions(itemsToProcess))
-      Catch ex As Exception
-         log.Msg.Error($"MSApps cleanup failed: {ex.Message}")
+         Await cl.RunAsync()
       Finally
          btnMSAppsRun.Enabled = True
       End Try
    End Sub
 
    '-----------------------------------------------------------------------------------------------
-   ' lvSysPurge: DrawColumnHeader
-   Private Sub lvSysPurge_DrawColumnHeader(sender As Object, e As DrawListViewColumnHeaderEventArgs) Handles lvMSApps.DrawColumnHeader
-      ' draw column headers with default style
-      e.DrawDefault = True
-   End Sub
-
-   '-----------------------------------------------------------------------------------------------
-   ' lvSysPurge: DrawItem
-   Private Sub lvSysPurge_DrawItem(sender As Object, e As DrawListViewItemEventArgs) Handles lvMSApps.DrawItem
-      ' draw items with default style (except subitem 2 which is handled in DrawSubItem)
-   End Sub
-
-   '-----------------------------------------------------------------------------------------------
-   ' lvSysPurge: DrawSubItem
-   Private Sub lvSysPurge_DrawSubItem(sender As Object, e As DrawListViewSubItemEventArgs) Handles lvMSApps.DrawSubItem
-      ' column 3 (index 2)
-      If e.ColumnIndex <> 2 Then
-         e.DrawDefault = True
-         Return
-      End If
-
-      e.DrawBackground()
-
-      Const COLOR_FILL_ACTIVE As Integer = &HD07800
-      Const COLOR_FILL_DONE As Integer = &H50B000
-      Const COLOR_BORDER As Integer = &HAAAAAA
-      Const PADDING_H As Integer = 3
-      Const PADDING_V As Integer = 4
-
-      Dim r As RECT
-      r.Top = e.ColumnIndex
-      r.Left = LVIR_BOUNDS
-      SendMessage(lvMSApps.Handle, LVM_GETSUBITEMRECT, CType(e.ItemIndex, IntPtr), r)
-
-      Dim rect = Rectangle.FromLTRB(r.Left, r.Top, r.Right, r.Bottom)
-      rect.Inflate(-PADDING_H, -PADDING_V)
-
-      Dim progress As Integer = 0
-      If e.Item.Tag IsNot Nothing Then
-         progress = CInt(e.Item.Tag)
-      End If
-
-      Dim g = e.Graphics
-
-      Using bg As New SolidBrush(SystemColors.Window)
-         g.FillRectangle(bg, rect)
-      End Using
-
-      If progress > 0 Then
-         Dim fillWidth = CInt(rect.Width * progress / 100.0)
-         Dim fillRect = New Rectangle(rect.Left, rect.Top, fillWidth, rect.Height)
-
-         Dim fillColor = If(progress >= 100, ColorTranslator.FromWin32(COLOR_FILL_DONE),
-                                            ColorTranslator.FromWin32(COLOR_FILL_ACTIVE))
-         Using br As New SolidBrush(fillColor)
-            g.FillRectangle(br, fillRect)
-         End Using
-      End If
-
-      Using pen As New Pen(ColorTranslator.FromWin32(COLOR_BORDER))
-         g.DrawRectangle(pen, rect)
-      End Using
-
-      If progress > 0 Then
-         Dim text = progress.ToString() & "%"
-         TextRenderer.DrawText(g, text, lvMSApps.Font, rect, Color.Black,
-                                  TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter)
-      End If
+   ' frmMSApps: onClosing
+   Private Sub frmMSApps_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+      cl?.CancelSizeScan()
    End Sub
 
 End Class

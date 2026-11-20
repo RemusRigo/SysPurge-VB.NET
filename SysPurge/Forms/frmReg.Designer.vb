@@ -23,91 +23,77 @@ Partial Class frmReg
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmReg))
-      lvReg = New ListView()
-      ColumnHeader1 = New ColumnHeader()
-      ColumnHeader2 = New ColumnHeader()
-      ColumnHeader3 = New ColumnHeader()
-      btnTSReg = New ToolStrip()
-      btnRegRun = New ToolStripButton()
-      StatusStrip1 = New StatusStrip()
-      btnTSReg.SuspendLayout()
-      SuspendLayout()
-      ' 
-      ' lvReg
-      ' 
-      lvReg.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-      lvReg.CheckBoxes = True
-      lvReg.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2, ColumnHeader3})
-      lvReg.FullRowSelect = True
-      lvReg.Location = New Point(0, 28)
-      lvReg.Name = "lvReg"
-      lvReg.OwnerDraw = True
-      lvReg.Size = New Size(807, 317)
-      lvReg.TabIndex = 0
-      lvReg.UseCompatibleStateImageBehavior = False
-      lvReg.View = View.Details
-      ' 
-      ' ColumnHeader1
-      ' 
-      ColumnHeader1.Text = "Action"
-      ' 
-      ' ColumnHeader2
-      ' 
-      ColumnHeader2.Text = "Result"
-      ' 
-      ' ColumnHeader3
-      ' 
-      ColumnHeader3.Text = "Progress"
-      ' 
-      ' btnTSReg
-      ' 
-      btnTSReg.Items.AddRange(New ToolStripItem() {btnRegRun})
-      btnTSReg.Location = New Point(0, 0)
-      btnTSReg.Name = "btnTSReg"
-      btnTSReg.Size = New Size(809, 25)
-      btnTSReg.TabIndex = 1
-      btnTSReg.Text = "ToolStrip1"
-      ' 
-      ' btnRegRun
-      ' 
-      btnRegRun.DisplayStyle = ToolStripItemDisplayStyle.Image
-      btnRegRun.Image = CType(resources.GetObject("btnRegRun.Image"), Image)
-      btnRegRun.ImageTransparentColor = Color.Magenta
-      btnRegRun.Name = "btnRegRun"
-      btnRegRun.Size = New Size(23, 22)
-      btnRegRun.Text = "ToolStripButton1"
-      ' 
-      ' StatusStrip1
-      ' 
-      StatusStrip1.Location = New Point(0, 348)
-      StatusStrip1.Name = "StatusStrip1"
-      StatusStrip1.Size = New Size(809, 22)
-      StatusStrip1.TabIndex = 2
-      StatusStrip1.Text = "StatusStrip1"
-      ' 
-      ' frmReg
-      ' 
-      AutoScaleDimensions = New SizeF(7F, 15F)
-      AutoScaleMode = AutoScaleMode.Font
-      ClientSize = New Size(809, 370)
-      Controls.Add(StatusStrip1)
-      Controls.Add(btnTSReg)
-      Controls.Add(lvReg)
-      Icon = CType(resources.GetObject("$this.Icon"), Icon)
-      Name = "frmReg"
-      Text = "SysPurge"
-      btnTSReg.ResumeLayout(False)
-      btnTSReg.PerformLayout()
-      ResumeLayout(False)
-      PerformLayout()
-   End Sub
+        Me.lvReg = New BufferedListView()
+        Me.btnTSReg = New System.Windows.Forms.ToolStrip()
+        Me.btnRegRun = New System.Windows.Forms.ToolStripButton()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.btnTSReg.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'lvReg
+        '
+        Me.lvReg.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lvReg.CheckBoxes = True
+        Me.lvReg.FullRowSelect = True
+        Me.lvReg.HideSelection = False
+        Me.lvReg.Location = New System.Drawing.Point(0, 24)
+        Me.lvReg.Name = "lvReg"
+        Me.lvReg.OwnerDraw = True
+        Me.lvReg.Size = New System.Drawing.Size(692, 275)
+        Me.lvReg.TabIndex = 0
+        Me.lvReg.UseCompatibleStateImageBehavior = False
+        Me.lvReg.View = System.Windows.Forms.View.Details
+        '
+        'btnTSReg
+        '
+        Me.btnTSReg.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnRegRun})
+        Me.btnTSReg.Location = New System.Drawing.Point(0, 0)
+        Me.btnTSReg.Name = "btnTSReg"
+        Me.btnTSReg.Size = New System.Drawing.Size(693, 25)
+        Me.btnTSReg.TabIndex = 1
+        Me.btnTSReg.Text = "ToolStrip1"
+        '
+        'btnRegRun
+        '
+        Me.btnRegRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.btnRegRun.Image = CType(resources.GetObject("btnRegRun.Image"), System.Drawing.Image)
+        Me.btnRegRun.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnRegRun.Name = "btnRegRun"
+        Me.btnRegRun.Size = New System.Drawing.Size(23, 22)
+        Me.btnRegRun.Text = "ToolStripButton1"
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 299)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 12, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(693, 22)
+        Me.StatusStrip1.TabIndex = 2
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'frmReg
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(693, 321)
+        Me.Controls.Add(Me.StatusStrip1)
+        Me.Controls.Add(Me.btnTSReg)
+        Me.Controls.Add(Me.lvReg)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmReg"
+        Me.Text = "SysPurge"
+        Me.btnTSReg.ResumeLayout(False)
+        Me.btnTSReg.PerformLayout()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
 
-   Friend WithEvents lvReg As ListView
-   Friend WithEvents ColumnHeader1 As ColumnHeader
-   Friend WithEvents ColumnHeader2 As ColumnHeader
-   Friend WithEvents ColumnHeader3 As ColumnHeader
-   Friend WithEvents btnTSReg As ToolStrip
-   Friend WithEvents btnRegRun As ToolStripButton
+    End Sub
+
+    Friend WithEvents lvReg As BufferedListView
+    Friend WithEvents btnTSReg As ToolStrip
+    Friend WithEvents btnRegRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip
 
 End Class

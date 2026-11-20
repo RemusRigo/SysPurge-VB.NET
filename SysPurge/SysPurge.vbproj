@@ -18,6 +18,15 @@
    <IntermediateOutputPath>obj\$(Configuration)\$(TfmName) $(Platform)\</IntermediateOutputPath>
 </PropertyGroup>
 
+<!-- net48 + dotnet CLI: resx files with images need preserialized resources -->
+<PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+   <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+</PropertyGroup>
+
+<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+   <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+</ItemGroup>
+
 <PropertyGroup Condition="'$(Platform)' == 'x86' Or '$(Platform)' == 'x64'">
    <PlatformTarget>$(Platform)</PlatformTarget>
 </PropertyGroup>

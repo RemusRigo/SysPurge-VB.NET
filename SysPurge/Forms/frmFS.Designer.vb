@@ -23,10 +23,7 @@ Partial Class frmFS
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFS))
-        Me.lvFS = New System.Windows.Forms.ListView()
-        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.lvFS = New BufferedListView()
         Me.tsFS = New System.Windows.Forms.ToolStrip()
         Me.tsFS_btnRun = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
@@ -39,7 +36,6 @@ Partial Class frmFS
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lvFS.CheckBoxes = True
-        Me.lvFS.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3})
         Me.lvFS.FullRowSelect = True
         Me.lvFS.HideSelection = False
         Me.lvFS.Location = New System.Drawing.Point(0, 24)
@@ -49,18 +45,6 @@ Partial Class frmFS
         Me.lvFS.TabIndex = 0
         Me.lvFS.UseCompatibleStateImageBehavior = False
         Me.lvFS.View = System.Windows.Forms.View.Details
-        '
-        'ColumnHeader1
-        '
-        Me.ColumnHeader1.Text = "Action"
-        '
-        'ColumnHeader2
-        '
-        Me.ColumnHeader2.Text = "Result"
-        '
-        'ColumnHeader3
-        '
-        Me.ColumnHeader3.Text = "Progress"
         '
         'tsFS
         '
@@ -107,12 +91,9 @@ Partial Class frmFS
 
     End Sub
 
-    Friend WithEvents lvFS As ListView
-   Friend WithEvents ColumnHeader1 As ColumnHeader
-   Friend WithEvents ColumnHeader2 As ColumnHeader
-   Friend WithEvents ColumnHeader3 As ColumnHeader
-   Friend WithEvents tsFS As ToolStrip
-   Friend WithEvents tsFS_btnRun As ToolStripButton
+    Friend WithEvents lvFS As BufferedListView
+    Friend WithEvents tsFS As ToolStrip
+    Friend WithEvents tsFS_btnRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip
 
 End Class

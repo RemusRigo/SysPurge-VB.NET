@@ -23,91 +23,77 @@ Partial Class frmMSApps
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMSApps))
-      lvMSApps = New ListView()
-      ColumnHeader1 = New ColumnHeader()
-      ColumnHeader2 = New ColumnHeader()
-      ColumnHeader3 = New ColumnHeader()
-      tsMSApps = New ToolStrip()
-      btnMSAppsRun = New ToolStripButton()
-      StatusStrip1 = New StatusStrip()
-      tsMSApps.SuspendLayout()
-      SuspendLayout()
-      ' 
-      ' lvMSApps
-      ' 
-      lvMSApps.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-      lvMSApps.CheckBoxes = True
-      lvMSApps.Columns.AddRange(New ColumnHeader() {ColumnHeader1, ColumnHeader2, ColumnHeader3})
-      lvMSApps.FullRowSelect = True
-      lvMSApps.Location = New Point(0, 28)
-      lvMSApps.Name = "lvMSApps"
-      lvMSApps.OwnerDraw = True
-      lvMSApps.Size = New Size(807, 317)
-      lvMSApps.TabIndex = 0
-      lvMSApps.UseCompatibleStateImageBehavior = False
-      lvMSApps.View = View.Details
-      ' 
-      ' ColumnHeader1
-      ' 
-      ColumnHeader1.Text = "Action"
-      ' 
-      ' ColumnHeader2
-      ' 
-      ColumnHeader2.Text = "Result"
-      ' 
-      ' ColumnHeader3
-      ' 
-      ColumnHeader3.Text = "Progress"
-      ' 
-      ' tsMSApps
-      ' 
-      tsMSApps.Items.AddRange(New ToolStripItem() {btnMSAppsRun})
-      tsMSApps.Location = New Point(0, 0)
-      tsMSApps.Name = "tsMSApps"
-      tsMSApps.Size = New Size(809, 25)
-      tsMSApps.TabIndex = 1
-      tsMSApps.Text = "ToolStrip1"
-      ' 
-      ' btnMSAppsRun
-      ' 
-      btnMSAppsRun.DisplayStyle = ToolStripItemDisplayStyle.Image
-      btnMSAppsRun.Image = CType(resources.GetObject("btnMSAppsRun.Image"), Image)
-      btnMSAppsRun.ImageTransparentColor = Color.Magenta
-      btnMSAppsRun.Name = "btnMSAppsRun"
-      btnMSAppsRun.Size = New Size(23, 22)
-      btnMSAppsRun.Text = "ToolStripButton1"
-      ' 
-      ' StatusStrip1
-      ' 
-      StatusStrip1.Location = New Point(0, 348)
-      StatusStrip1.Name = "StatusStrip1"
-      StatusStrip1.Size = New Size(809, 22)
-      StatusStrip1.TabIndex = 2
-      StatusStrip1.Text = "StatusStrip1"
-      ' 
-      ' frmMSApps
-      ' 
-      AutoScaleDimensions = New SizeF(7F, 15F)
-      AutoScaleMode = AutoScaleMode.Font
-      ClientSize = New Size(809, 370)
-      Controls.Add(StatusStrip1)
-      Controls.Add(tsMSApps)
-      Controls.Add(lvMSApps)
-      Icon = CType(resources.GetObject("$this.Icon"), Icon)
-      Name = "frmMSApps"
-      Text = "SysPurge"
-      tsMSApps.ResumeLayout(False)
-      tsMSApps.PerformLayout()
-      ResumeLayout(False)
-      PerformLayout()
-   End Sub
+        Me.lvMSApps = New BufferedListView()
+        Me.tsMSApps = New System.Windows.Forms.ToolStrip()
+        Me.btnMSAppsRun = New System.Windows.Forms.ToolStripButton()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.tsMSApps.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'lvMSApps
+        '
+        Me.lvMSApps.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lvMSApps.CheckBoxes = True
+        Me.lvMSApps.FullRowSelect = True
+        Me.lvMSApps.HideSelection = False
+        Me.lvMSApps.Location = New System.Drawing.Point(0, 24)
+        Me.lvMSApps.Name = "lvMSApps"
+        Me.lvMSApps.OwnerDraw = True
+        Me.lvMSApps.Size = New System.Drawing.Size(692, 275)
+        Me.lvMSApps.TabIndex = 0
+        Me.lvMSApps.UseCompatibleStateImageBehavior = False
+        Me.lvMSApps.View = System.Windows.Forms.View.Details
+        '
+        'tsMSApps
+        '
+        Me.tsMSApps.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnMSAppsRun})
+        Me.tsMSApps.Location = New System.Drawing.Point(0, 0)
+        Me.tsMSApps.Name = "tsMSApps"
+        Me.tsMSApps.Size = New System.Drawing.Size(693, 25)
+        Me.tsMSApps.TabIndex = 1
+        Me.tsMSApps.Text = "ToolStrip1"
+        '
+        'btnMSAppsRun
+        '
+        Me.btnMSAppsRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.btnMSAppsRun.Image = CType(resources.GetObject("btnMSAppsRun.Image"), System.Drawing.Image)
+        Me.btnMSAppsRun.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.btnMSAppsRun.Name = "btnMSAppsRun"
+        Me.btnMSAppsRun.Size = New System.Drawing.Size(23, 22)
+        Me.btnMSAppsRun.Text = "ToolStripButton1"
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 299)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 12, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(693, 22)
+        Me.StatusStrip1.TabIndex = 2
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'frmMSApps
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(693, 321)
+        Me.Controls.Add(Me.StatusStrip1)
+        Me.Controls.Add(Me.tsMSApps)
+        Me.Controls.Add(Me.lvMSApps)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmMSApps"
+        Me.Text = "SysPurge"
+        Me.tsMSApps.ResumeLayout(False)
+        Me.tsMSApps.PerformLayout()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
 
-   Friend WithEvents lvMSApps As ListView
-   Friend WithEvents ColumnHeader1 As ColumnHeader
-   Friend WithEvents ColumnHeader2 As ColumnHeader
-   Friend WithEvents ColumnHeader3 As ColumnHeader
-   Friend WithEvents tsMSApps As ToolStrip
-   Friend WithEvents btnMSAppsRun As ToolStripButton
+    End Sub
+
+    Friend WithEvents lvMSApps As BufferedListView
+    Friend WithEvents tsMSApps As ToolStrip
+    Friend WithEvents btnMSAppsRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip
 
 End Class

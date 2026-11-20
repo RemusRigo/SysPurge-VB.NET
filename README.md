@@ -65,12 +65,14 @@ See the [User's Guide](Users%20Guide.md) for downloads, runtimes, installation a
 
 ## Roadmap
 
-* 2026-07-25: Update: Change Clean Task to delete the parent folder if empty (optional)
+* 2026-11-20: Add: Clear Recycle Bin
+* 2026-11-20: Mod: Change Add items/Process items into a class
+* 2026-07-25: Mod: Change Clean Task to delete the parent folder if empty (optional)
 * 2026-07-25: Add: Clear Previous Windows Installations folder
 * 2026-07-25: Add: Clear OneDrive Temp folder
 * 2026-07-25: Add: Clear Steam
-* 2026-07-23: Update: Change UI: replace TreeView with Buttons / split into four categories
-* 2026-07-21: Update: Change UI / split into two categories
+* 2026-07-23: Mod: Change UI: replace TreeView with Buttons / split into four categories
+* 2026-07-21: Mod: Change UI / split into two categories
 * 2026-07-18: Add: Clear Google Chrome Software Reporter Tool logs
 * 2026-07-18: Add: Clear privacy.sexy runs
 * 2026-07-18: Add: Clear privacy.sexy logs
