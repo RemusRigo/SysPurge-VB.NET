@@ -30,6 +30,13 @@ Public Class frmMSApps
                New CleanTarget(Path.Combine(userProfile, ".dotnet\TelemetryStorageService"), "*.*", False, False))
 
             '-------------------------------------------------------------
+            cl.AddGroup("Copilot")
+
+            ' All data (Current User)
+            cl.AddItem("All data (Current User)", True,
+               New CleanTarget(Path.Combine(userProfile, ".copilot"), "*.*", True, True, True))
+
+            '-------------------------------------------------------------
             cl.AddGroup("EventViewer")
 
             ' Logs
@@ -44,7 +51,6 @@ Public Class frmMSApps
             ' Shader Cache
             cl.AddItem("Shader Cache", True,
                New CleanTarget(Path.Combine(localAppData, "Microsoft\DirectX Shader Cache"), "*.*", False, False))
-            cl.AddRegItem("Direct3D: Most Recent Application", True, Registry.CurrentUser, "Software\Microsoft\Direct3D\MostRecentApplication")
 
             '-------------------------------------------------------------
             cl.AddGroup("Internet Explorer")

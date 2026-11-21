@@ -1,13 +1,15 @@
 ﻿'--------------------------------------------------------------------------------------------------
-' SysPurge: BufferedListView.vb - flicker-free ListView (double buffered, no background erase)
+' SysPurge: SPListView.vb - flicker-free ListView (double buffered, no background erase)
 '    © 2026 Remus Rigo
 '       v1.0.20261120
 '--------------------------------------------------------------------------------------------------
 
-Public Class BufferedListView
+Public Class SPListView
    Inherits ListView
 
    Private Const WM_ERASEBKGND As Integer = &H14
+
+   Private ReadOnly lv As ListView
 
    Public Sub New()
       ' DoubleBuffered also sets LVS_EX_DOUBLEBUFFER and keeps it when the handle is recreated

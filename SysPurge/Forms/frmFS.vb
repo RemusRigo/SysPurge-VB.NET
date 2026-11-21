@@ -17,7 +17,8 @@ Public Class frmFS
    ' Build Options
    Public Sub BuildOptions()
       Dim winDir As String = Environment.GetEnvironmentVariable("SystemRoot")
-      Dim appData As String = Environment.GetEnvironmentVariable("APPDATA")
+      Dim appData As String = Environment.GetEnvironmentVariable("AppData")
+      Dim localAppData As String = Environment.GetEnvironmentVariable("LocalAppData")
 
       cl.Build(
          Sub()
@@ -27,7 +28,9 @@ Public Class frmFS
 
             ' User Temp folder
             cl.AddItem("User Temp folder", True,
-               New CleanTarget(Environment.GetEnvironmentVariable("TEMP")))
+               New CleanTarget(Environment.GetEnvironmentVariable("TEMP")),
+               New CleanTarget(Path.Combine(localAppData, "Temp"))
+               )
 
             ' System Temp folder
             cl.AddItem("System Temp folder", True,
@@ -58,7 +61,7 @@ Public Class frmFS
             cl.AddGroup("Microsoft Windows FileSystem")
 
             ' Jump List
-            cl.AddItem("Jump List", True,
+            cl.AddItem("Jump List", False,
                New CleanTarget(Path.Combine(appData, "Microsoft\Windows\Recent\AutomaticDestinations"), "*.automaticDestinations-ms", False, False),
                New CleanTarget(Path.Combine(appData, "Microsoft\Windows\Recent\CustomDestinations"), "*.customDestinations-ms", False, False))
 
@@ -67,12 +70,12 @@ Public Class frmFS
                New CleanTarget(Path.Combine(winDir, "Prefetch"), "*.pf", False, False))
 
             ' Recent Items
-            cl.AddItem("Recent Items", True,
+            cl.AddItem("Recent Items", False,
                New CleanTarget(Path.Combine(appData, "Microsoft\Windows\Recent"), "*.*", False, False),
                New CleanTarget(RegReadSZ(Registry.CurrentUser, "Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders", "Recent"), "*.*", False, False))
 
             ' Recycle Bin
-            cl.AddCustomItem("Recycle Bin", True, AddressOf TaskEmptyRecycleBin, AddressOf GetRecycleBinSizeText)
+            cl.AddCustomItem("Recycle Bin", False, AddressOf TaskEmptyRecycleBin, AddressOf GetRecycleBinSizeText)
 
             ' Windows Update cache
             If IsAppElevated() Then

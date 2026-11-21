@@ -23,7 +23,7 @@ Partial Class frmReg
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmReg))
-        Me.lvReg = New BufferedListView()
+        Me.lvReg = New SPListView()
         Me.btnTSReg = New System.Windows.Forms.ToolStrip()
         Me.btnRegRun = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
@@ -91,7 +91,7 @@ Partial Class frmReg
 
     End Sub
 
-    Friend WithEvents lvReg As BufferedListView
+    Friend WithEvents lvReg As SPListView
     Friend WithEvents btnTSReg As ToolStrip
     Friend WithEvents btnRegRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip

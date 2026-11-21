@@ -23,7 +23,7 @@ Partial Class frmMSApps
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMSApps))
-        Me.lvMSApps = New BufferedListView()
+        Me.lvMSApps = New SPListView()
         Me.tsMSApps = New System.Windows.Forms.ToolStrip()
         Me.btnMSAppsRun = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
@@ -91,7 +91,7 @@ Partial Class frmMSApps
 
     End Sub
 
-    Friend WithEvents lvMSApps As BufferedListView
+    Friend WithEvents lvMSApps As SPListView
     Friend WithEvents tsMSApps As ToolStrip
     Friend WithEvents btnMSAppsRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip

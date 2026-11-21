@@ -3,14 +3,14 @@ SysPurge: a Windows cleaning tool
 
 
 
-## Author
+## 👤 Author
 
 * [@remusrigo](https://github.com/RemusRigo)
 * [@remusrigo](https://sourceforge.net/u/remusrigo/profile)
 
 
 
-## Features
+## ✨ Features
 
 * File System:
   * Temporary/Junk files: user and system Temp folders, log files, previous Windows installation (`Windows.old`)
@@ -43,13 +43,13 @@ SysPurge: a Windows cleaning tool
 
 
 
-## User's Guide
+## ⚙️ User's Guide
 
 See the [User's Guide](Users%20Guide.md) for downloads, runtimes, installation and usage.
 
 
 
-## Statistics
+## 🛠️ Statistics
 
 ![VB.NET](https://img.shields.io/badge/Language-VB.NET-blue)
 ![API](https://img.shields.io/badge/API-AdvAPI32-lightblue)
@@ -63,10 +63,11 @@ See the [User's Guide](Users%20Guide.md) for downloads, runtimes, installation a
 
 
 
-## Roadmap
+## 🗺️ Roadmap
 
+* 2026-11-21: Add: Context Menu for ListView to Check/Uncheck all and load Defaults
 * 2026-11-20: Add: Clear Recycle Bin
-* 2026-11-20: Mod: Change Add items/Process items into a class
+* 2026-11-20: Add: Implement new class for building items and running actions
 * 2026-07-25: Mod: Change Clean Task to delete the parent folder if empty (optional)
 * 2026-07-25: Add: Clear Previous Windows Installations folder
 * 2026-07-25: Add: Clear OneDrive Temp folder
@@ -100,3 +101,10 @@ See the [User's Guide](Users%20Guide.md) for downloads, runtimes, installation a
 * 2011-11-11: SysCleaner written in VB.NET
 * 2010-06-04: SysCleaner written in Delphi
 * 2008-02-21: SysSweeper written in Delphi
+
+
+
+## ToDo
+
+* %LocalAppData%\Microsoft\Office\SolutionPackages ???
+* %LocalAppData%\Packages

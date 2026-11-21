@@ -17,10 +17,16 @@ Public Class frmReg
       cl.Build(
          Sub()
             '-------------------------------------------------------------
-            cl.AddGroup("MRU")
+            cl.AddGroup("Microsoft Windows")
 
             ' Run MRU
             cl.AddRegItem("Run MRU", True, Registry.CurrentUser, "Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU")
+
+            '-------------------------------------------------------------
+            cl.AddGroup("Microsoft DirectX")
+
+            ' Direct3D: Most Recent Application
+            cl.AddRegItem("Direct3D: Most Recent Application", True, Registry.CurrentUser, "Software\Microsoft\Direct3D\MostRecentApplication")
 
             '-------------------------------------------------------------
             cl.AddGroup("Misc")

@@ -23,7 +23,7 @@ Partial Class frmFS
    <System.Diagnostics.DebuggerStepThrough()>
    Private Sub InitializeComponent()
       Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFS))
-        Me.lvFS = New BufferedListView()
+        Me.lvFS = New SPListView()
         Me.tsFS = New System.Windows.Forms.ToolStrip()
         Me.tsFS_btnRun = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
@@ -91,7 +91,7 @@ Partial Class frmFS
 
     End Sub
 
-    Friend WithEvents lvFS As BufferedListView
+    Friend WithEvents lvFS As SPListView
     Friend WithEvents tsFS As ToolStrip
     Friend WithEvents tsFS_btnRun As ToolStripButton
    Friend WithEvents StatusStrip1 As StatusStrip

@@ -31,6 +31,7 @@ End Class
 Friend Class CleanAction
    Public Name As String
    Public Group As String
+   Public DefaultChecked As Boolean                         ' isChecked value the row was added with
    Public Targets As New List(Of CleanTarget)               ' folders/files
    Public Reg As RegTarget                                  ' registry values
    Public CustomClean As Action(Of ListView, ListViewItem)  ' anything else (e.g. TaskClearEventLogs)
@@ -78,6 +79,54 @@ Friend Class CleanerList
       AddHandler lv.DrawColumnHeader, Sub(s, e) e.DrawDefault = True
       AddHandler lv.DrawItem, Sub(s, e) Return         ' rows are drawn per sub-item
       AddHandler lv.DrawSubItem, AddressOf DrawSubItem
+
+      AttachContextMenu()
+   End Sub
+
+   '-----------------------------------------------------------------------------------------------
+   ' Right-click menu: Check all / Uncheck all / Defaults
+   Private Sub AttachContextMenu()
+      Dim menu As New ContextMenuStrip()
+      Dim miCheck = menu.Items.Add("Check all", Nothing, Sub() CheckAll(True))
+      Dim miUncheck = menu.Items.Add("Uncheck all", Nothing, Sub() CheckAll(False))
+      menu.Items.Add(New ToolStripSeparator())
+      Dim miDefaults = menu.Items.Add("Defaults", Nothing, Sub() CheckDefaults())
+
+      ' Enable only what makes sense for the current state
+      AddHandler menu.Opening,
+         Sub(s, e)
+            Dim all = lv.Items.Cast(Of ListViewItem)()
+            miCheck.Enabled = all.Any(Function(i) Not i.Checked)
+            miUncheck.Enabled = all.Any(Function(i) i.Checked)
+            miDefaults.Enabled = all.Any(Function(i) i.Checked <> IsDefaultChecked(i))
+         End Sub
+
+      lv.ContextMenuStrip = menu
+   End Sub
+
+   Public Sub CheckAll(checked As Boolean)
+      SetChecked(Function(i) checked)
+   End Sub
+
+   ' Restores each row to the isChecked value it was added with (AddItem/AddRegItem/AddCustomItem)
+   Public Sub CheckDefaults()
+      SetChecked(AddressOf IsDefaultChecked)
+   End Sub
+
+   Private Function IsDefaultChecked(item As ListViewItem) As Boolean
+      Dim act As CleanAction = Nothing
+      Return actions.TryGetValue(item, act) AndAlso act.DefaultChecked
+   End Function
+
+   Private Sub SetChecked(getValue As Func(Of ListViewItem, Boolean))
+      lv.BeginUpdate()
+      Try
+         For Each item As ListViewItem In lv.Items
+            item.Checked = getValue(item)
+         Next
+      Finally
+         lv.EndUpdate()
+      End Try
    End Sub
 
    '-----------------------------------------------------------------------------------------------
@@ -151,7 +200,8 @@ Friend Class CleanerList
       item.Group = grp
       lv.Items.Add(item)
 
-      Dim act As New CleanAction With {.Name = name, .Group = If(grp Is Nothing, "", grp.Header)}
+      Dim act As New CleanAction With {.Name = name, .Group = If(grp Is Nothing, "", grp.Header),
+                                       .DefaultChecked = isChecked}
       actions(item) = act
       Return act
    End Function
